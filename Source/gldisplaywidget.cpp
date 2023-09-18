@@ -24,6 +24,10 @@ void GLDisplayWidget::initializeGL()
     glEnable(GL_LIGHT0);
     glEnable(GL_COLOR_MATERIAL);
 
+    _geomWorld._mesh.loadOFF("../Asset/queen.off");
+
+    //_geomWorld._mesh.saveOFF();
+
     //** TP : To add....
     // Construction of the GeometricWorld before it is displayed
     // It can also be constructed following a signal (button)
@@ -51,6 +55,7 @@ void GLDisplayWidget::paintGL(){
     // example with a tetraedre
     //_geomWorld.drawWireFrame();
     _geomWorld._mesh.drawMeshWireFrame();
+
     //_geomWorld.draw();
 }
 
@@ -78,7 +83,7 @@ void GLDisplayWidget::mouseMoveEvent(QMouseEvent *event)
     int dx = event->position().x() - _lastPosMouse.x();
     int dy = event->position().y() - _lastPosMouse.y();
 
-    printf("dx = %d, dy = %d\n", dx, dy);
+    //printf("dx = %d, dy = %d\n", dx, dy);
 
     if( event != NULL )
     {

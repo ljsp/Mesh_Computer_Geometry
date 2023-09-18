@@ -40,6 +40,9 @@ public:
     ~Mesh();
     void drawMesh();
     void drawMeshWireFrame();
+    void saveOFF();
+    void loadOFF(const char* filename);
+    std::pair<int,int> edge(int v1, int v2);
     std::vector<Vertex> vertices;
     std::vector<Face> faces;
 private:
