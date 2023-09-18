@@ -2,39 +2,13 @@
 #define MESH_H
 
 #include <QOpenGLWidget>
-
-// TO MODIFY
-class Point
-{
-public:
-    double _x;
-    double _y;
-    double _z;
-
-    Point():_x(),_y(),_z() {}
-    Point(float x_, float y_, float z_):_x(x_),_y(y_),_z(z_) {}
-};
-
-class Face {
-public:
-    Face(int v1, int v2, int v3, int tri1, int tri2, int tri3);
-    ~Face();
-    int vertices[3];
-    int adjacentTrianglesId[3];
-private:
-};
-
-class Vertex {
-public:
-    Vertex(Point p, int triId);
-    ~Vertex();
-    Point point;
-    int triangleId;
-private:
-};
+#include "Structures.h"
 
 class Mesh
 {
+private:
+    std::map<std::pair<int,int>,std::pair<int,int>> map;
+
 public:
     Mesh();
     ~Mesh();
@@ -42,7 +16,7 @@ public:
     void drawMeshWireFrame();
     void saveOFF();
     void loadOFF(const char* filename);
-    std::pair<int,int> edge(int v1, int v2);
+    static std::pair<int,int> edge(int v1, int v2);
     std::vector<Vertex> vertices;
     std::vector<Face> faces;
 
@@ -88,21 +62,6 @@ public:
 
     Circulator_on_vertices incident_vertices(Face f) { return Circulator_on_vertices(vertices.begin() + f.vertices[0]); }
     Circulator_on_vertices incident_vertices(int f) { return Circulator_on_vertices(vertices.begin() + faces.at(f).vertices[0]); }
-
-private:
-    std::map<std::pair<int,int>,std::pair<int,int>> map;
 };
-
-class GeometricWorld //Generally used to create a singleton instance
-{
-    QVector<Point> _bBox;  // Bounding box // ou std::vector
-public :
-    GeometricWorld();
-    void draw();
-    void drawWireFrame();
-
-    Mesh _mesh;
-};
-
 
 #endif // MESH_H

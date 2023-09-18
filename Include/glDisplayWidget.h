@@ -8,7 +8,8 @@
 
 #include <QtWidgets>
 #include <QTimer>
-#include "mesh.h"  // Model
+#include "GeometricWorld.h"
+#include "Mesh.h"
 
 class GLDisplayWidget : public QOpenGLWidget
 {
@@ -24,12 +25,13 @@ protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
+    void keyPressEvent(QKeyEvent *event);
 
 private:
 
     QTimer _timer; // To update the scene
     float _X = 0.f, _Y = 0.f ,_Z = 0.f; // Translation
-    float _angleX, _angleY; // Rotation
+    float _angleX = 0.f, _angleY = 0.f; // Rotation
 
     QPoint _lastPosMouse; // To keep the last position of the mouse
 

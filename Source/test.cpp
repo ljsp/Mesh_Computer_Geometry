@@ -2,7 +2,7 @@
 // Created by lucas on 18/09/23.
 //
 #include <iostream>
-#include "Include/mesh.h"
+#include "Include/Mesh.h"
 
 int main() {
     Mesh titi;

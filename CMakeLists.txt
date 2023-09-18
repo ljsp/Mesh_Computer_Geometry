@@ -21,16 +21,22 @@ set(UI_DIR UI)
 
 set(SOURCES
         ${SRC_DIR}/main.cpp
-        ${SRC_DIR}/mainwindow.cpp
-        ${SRC_DIR}/gldisplaywidget.cpp
-        ${SRC_DIR}/mesh.cpp
+        ${SRC_DIR}/MainWindow.cpp
+        ${SRC_DIR}/glDisplayWidget.cpp
+        ${SRC_DIR}/Mesh.cpp
+        ${SRC_DIR}/GeometricWorld.cpp
+        ${SRC_DIR}/Structures.cpp
 )
 
 set(HEADERS
-        ${INC_DIR}/mainwindow.h
-        ${INC_DIR}/gldisplaywidget.h
-        ${INC_DIR}/mesh.h
+        ${INC_DIR}/MainWindow.h
+        ${INC_DIR}/glDisplayWidget.h
+        ${INC_DIR}/Mesh.h
+        ${INC_DIR}/GeometricWorld.h
+        ${INC_DIR}/Structures.h
+        ${INC_DIR}/Utils.h
 )
+
 qt_add_executable(${PROJECT_NAME}
     MANUAL_FINALIZATION
     ${SOURCES}

@@ -1,8 +1,10 @@
-#include "Include/gldisplaywidget.h"
+#include "Include/glDisplayWidget.h"
 #ifdef __APPLE__
 #include <glu.h>
 #else
 #include <GL/glu.h>
+#include <iostream>
+
 #endif
 
 #include "QDebug"
@@ -16,46 +18,32 @@ GLDisplayWidget::GLDisplayWidget(QWidget *parent) : QOpenGLWidget(parent)
 
 void GLDisplayWidget::initializeGL()
 {
-    // background color
     glClearColor(0.2, 0.2, 0.2, 1);
 
-    // Shader
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHT0);
     glEnable(GL_COLOR_MATERIAL);
 
     _geomWorld._mesh.loadOFF("../Asset/queen.off");
-
     //_geomWorld._mesh.saveOFF();
-
-    //** TP : To add....
-    // Construction of the GeometricWorld before it is displayed
-    // It can also be constructed following a signal (button)
 }
 
 void GLDisplayWidget::paintGL(){
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Center the camera
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(0,0,5,  0,0,0,   0,1,0); //gluLookAt(eye, center, up)  //deprecated
-    // Returns a 4x4 matrix that transforms world coordinates to eye coordinates.
-    // Translation
+    gluLookAt(0,0,5,0,0,0,0,1,0);
+
     glTranslated(_X, _Y, _Z);
-
-    // Rotation
+    glRotatef(_angleY, 0.0f, 0.0f, 1.0f);
     glRotatef(_angleX, 0.0f, 1.0f, 0.0f);
-    glRotatef(_angleY, 1.0f, 0.0f, 0.0f);
 
-    // Color for your _geomWorld
     glColor3f(0, 1 ,0);
 
-    // example with a tetraedre
-    //_geomWorld.drawWireFrame();
     _geomWorld._mesh.drawMeshWireFrame();
-
+    //_geomWorld.drawWireFrame();
     //_geomWorld.draw();
 }
 
@@ -69,21 +57,16 @@ void GLDisplayWidget::resizeGL(int width, int height){
     update();
 }
 
-// - - - - - - - - - - - - Mouse Management  - - - - - - - - - - - - - - - -
-// When you click, the position of your mouse is saved
 void GLDisplayWidget::mousePressEvent(QMouseEvent *event)
 {
     if( event != NULL )
         _lastPosMouse = event->pos();
 }
 
-// Mouse movement management
 void GLDisplayWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    int dx = event->position().x() - _lastPosMouse.x();
-    int dy = event->position().y() - _lastPosMouse.y();
-
-    //printf("dx = %d, dy = %d\n", dx, dy);
+    qreal dx = event->position().x() - _lastPosMouse.x();
+    qreal dy = event->position().y() - _lastPosMouse.y();
 
     if( event != NULL )
     {
@@ -95,12 +78,38 @@ void GLDisplayWidget::mouseMoveEvent(QMouseEvent *event)
     }
 }
 
-// Mouse Management for the zoom
 void GLDisplayWidget::wheelEvent(QWheelEvent *event) {
     QPoint numDegrees = event->angleDelta();
-    double stepZoom = 0.25;
+    double stepZoom = 0.1;
     if (!numDegrees.isNull())
     {
         _Z = (numDegrees.x() > 0 || numDegrees.y() > 0) ? _Z + stepZoom : _Z - stepZoom;
+    }
+}
+
+void GLDisplayWidget::keyPressEvent(QKeyEvent *event) {
+    switch(event->key()) {
+        case Qt::Key_Z:
+            _angleY += 5.0;
+            break;
+        case Qt::Key_S:
+            _angleY -= 5.0;
+            break;
+        case Qt::Key_Q:
+            _angleX -= 5.0;
+            break;
+        case Qt::Key_D:
+            _angleX += 5.0;
+            break;
+        case Qt::Key_A:
+            _Y -= 0.1;
+            break;
+        case Qt::Key_E:
+            _Y += 0.1;
+            break;
+        case Qt::Key_Escape:
+            exit(0);
+        default:
+            break;
     }
 }
