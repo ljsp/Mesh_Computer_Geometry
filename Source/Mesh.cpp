@@ -23,7 +23,7 @@ Mesh::Mesh() {
 
 void Mesh::drawMesh() {
     for(int i = 0; i < faces.size(); i++) {
-        glColor3d(1,0,0);
+        glColor3d(0.4,0.4,0.4);
         glBegin(GL_TRIANGLES);
         glPointDraw(vertices.at(faces[i].vertices[0]).point);
         glPointDraw(vertices.at(faces[i].vertices[1]).point);
@@ -50,7 +50,7 @@ void Mesh::drawMeshWireFrame() {
     }
 }
 
-void Mesh::loadOFF(const char *filename) {
+void Mesh::loadOFF(const char *filename, bool isTriangulated) {
     vertices.clear(); faces.clear();
     std::ifstream file;
     file.open(filename);
@@ -74,6 +74,13 @@ void Mesh::loadOFF(const char *filename) {
 
         for(int j = 0; j < nbVerticesInFace; j++) {
             file >> verticesInFace[j];
+        }
+
+        if(!isTriangulated) {
+            for (int j = 0; j < 3; j++) {
+                int trash;
+                file >> trash;
+            }
         }
 
         faces.emplace_back(verticesInFace[0], verticesInFace[1], verticesInFace[2], -1, -1, -1);
@@ -135,9 +142,9 @@ std::pair<int,int> Mesh::edge(int v1, int v2) {
     return std::make_pair(v2,v1);
 }
 
-void Mesh::saveOFF() {
+void Mesh::saveOFF(QString filename) {
     std::ofstream file;
-    file.open ("mesh.off");
+    file.open(filename.toStdString().c_str());
     file << "OFF\n";
     file << vertices.size() << " " << faces.size() << " 0\n";
     for(int i = 0; i < vertices.size(); i++) {

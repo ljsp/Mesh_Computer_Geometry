@@ -15,6 +15,12 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+public slots:
+    void loadFile();
+    void saveFile();
+    void setWireFrame();
+    void setCurrentMesh(int index);
+
 private:
     Ui::MainWindow *ui;
 };

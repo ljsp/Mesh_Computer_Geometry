@@ -63,85 +63,96 @@
          <property name="layoutDirection">
           <enum>Qt::RightToLeft</enum>
          </property>
-         <widget class="QFrame" name="frame_2">
+         <widget class="QGroupBox" name="groupBox">
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>10</y>
-            <width>187</width>
-            <height>661</height>
+            <y>20</y>
+            <width>241</width>
+            <height>641</height>
            </rect>
           </property>
-          <property name="frameShape">
-           <enum>QFrame::VLine</enum>
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
           </property>
-          <property name="frameShadow">
-           <enum>QFrame::Raised</enum>
+          <property name="title">
+           <string>Settings</string>
           </property>
-          <property name="lineWidth">
-           <number>0</number>
-          </property>
-          <layout class="QFormLayout" name="formLayout">
-           <property name="horizontalSpacing">
-            <number>0</number>
+          <widget class="QPushButton" name="exit_button">
+           <property name="geometry">
+            <rect>
+             <x>70</x>
+             <y>600</y>
+             <width>86</width>
+             <height>25</height>
+            </rect>
            </property>
-           <property name="verticalSpacing">
-            <number>0</number>
+           <property name="text">
+            <string>Exit</string>
            </property>
-           <property name="leftMargin">
-            <number>0</number>
+          </widget>
+          <widget class="QCheckBox" name="wireframe_checkbox">
+           <property name="geometry">
+            <rect>
+             <x>20</x>
+             <y>150</y>
+             <width>92</width>
+             <height>23</height>
+            </rect>
            </property>
-           <property name="topMargin">
-            <number>0</number>
+           <property name="text">
+            <string>Wireframe</string>
            </property>
-           <property name="bottomMargin">
-            <number>0</number>
+          </widget>
+          <widget class="QPushButton" name="load_button">
+           <property name="geometry">
+            <rect>
+             <x>20</x>
+             <y>110</y>
+             <width>89</width>
+             <height>25</height>
+            </rect>
            </property>
-           <item row="0" column="0">
-            <widget class="QPushButton" name="pushButton">
-             <property name="text">
-              <string>Save mesh</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QPushButton" name="pushButton_2">
-             <property name="text">
-              <string>Exit</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QPushButton" name="pushButton_4">
-             <property name="text">
-              <string>PushButton</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QPushButton" name="pushButton_3">
-             <property name="text">
-              <string>PushButton</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <spacer name="verticalSpacer">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>600</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
+           <property name="text">
+            <string>Load mesh</string>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="save_button">
+           <property name="geometry">
+            <rect>
+             <x>130</x>
+             <y>110</y>
+             <width>89</width>
+             <height>25</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Save Mesh</string>
+           </property>
+          </widget>
+          <widget class="QCheckBox" name="inf_point_checkbox">
+           <property name="geometry">
+            <rect>
+             <x>120</x>
+             <y>150</y>
+             <width>121</width>
+             <height>23</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Infinite Point</string>
+           </property>
+          </widget>
+          <widget class="QListWidget" name="object_list">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>40</y>
+             <width>221</width>
+             <height>51</height>
+            </rect>
+           </property>
+          </widget>
          </widget>
         </widget>
        </item>

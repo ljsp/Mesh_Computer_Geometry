@@ -24,7 +24,10 @@ void GLDisplayWidget::initializeGL()
     glEnable(GL_LIGHT0);
     glEnable(GL_COLOR_MATERIAL);
 
-    _geomWorld._mesh.loadOFF("../Asset/queen.off");
+    //_geomWorld._mesh.loadOFF("../Asset/queen.off");
+    _geomWorld.addMesh("../Asset/queen.off", true);
+    _geomWorld.addMesh("../Asset/cube_maillage_triangles.off", true);
+    //_geomWorld.addMesh("../Asset/champi.off", false);
     //_geomWorld._mesh.saveOFF();
 }
 
@@ -42,7 +45,12 @@ void GLDisplayWidget::paintGL(){
 
     glColor3f(0, 1 ,0);
 
-    _geomWorld._mesh.drawMeshWireFrame();
+    if(isWireFrame)
+        _geomWorld._meshes.at(currentMesh).drawMeshWireFrame();
+    else
+        _geomWorld._meshes.at(currentMesh).drawMesh();
+
+    //_geomWorld._mesh.drawMeshWireFrame();
     //_geomWorld.drawWireFrame();
     //_geomWorld.draw();
 }

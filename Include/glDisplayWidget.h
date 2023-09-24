@@ -20,6 +20,10 @@ public:
     void paintGL(); // Display the scene Gl
     void resizeGL(int width, int height);
 
+    bool isWireFrame = false;
+    int currentMesh = 0;
+    GeometricWorld _geomWorld;
+
 protected:
     // Mouse Management
     void mousePressEvent(QMouseEvent *event);
@@ -34,8 +38,6 @@ private:
     float _angleX = 0.f, _angleY = 0.f; // Rotation
 
     QPoint _lastPosMouse; // To keep the last position of the mouse
-
-    GeometricWorld _geomWorld; // The scene to be displayed
 };
 
 #endif // GLDISPLAYWIDGET_H

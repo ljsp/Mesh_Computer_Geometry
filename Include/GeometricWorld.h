@@ -14,7 +14,8 @@ public :
     GeometricWorld();
     void draw();
     void drawWireFrame();
-
+    void addMesh(QString filename, bool isTriangulated);
+    std::vector<Mesh> _meshes;
     Mesh _mesh;
 };
 
