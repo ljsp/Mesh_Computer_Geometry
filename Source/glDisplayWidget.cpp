@@ -24,11 +24,9 @@ void GLDisplayWidget::initializeGL()
     glEnable(GL_LIGHT0);
     glEnable(GL_COLOR_MATERIAL);
 
-    //_geomWorld._mesh.loadOFF("../Asset/queen.off");
     _geomWorld.addMesh("../Asset/queen.off", true);
     _geomWorld.addMesh("../Asset/cube_maillage_triangles.off", true);
-    //_geomWorld.addMesh("../Asset/champi.off", false);
-    //_geomWorld._mesh.saveOFF();
+    _geomWorld.addMesh("../Asset/square.off", true);
 }
 
 void GLDisplayWidget::paintGL(){
@@ -45,14 +43,18 @@ void GLDisplayWidget::paintGL(){
 
     glColor3f(0, 1 ,0);
 
-    if(isWireFrame)
+    if(isWireFrame) {
         _geomWorld._meshes.at(currentMesh).drawMeshWireFrame();
-    else
+    } else {
         _geomWorld._meshes.at(currentMesh).drawMesh();
+        //_geomWorld._meshes.at(currentMesh).drawMeshIterator();
+        //_geomWorld._meshes.at(currentMesh).drawMeshCirculator(0);
+        //_geomWorld._meshes.at(currentMesh).drawTriangle(0);
+    }
 
-    //_geomWorld._mesh.drawMeshWireFrame();
-    //_geomWorld.drawWireFrame();
-    //_geomWorld.draw();
+    if(isInfPoint) {
+        _geomWorld._meshes.at(currentMesh).drawInfPoint();
+    }
 }
 
 void GLDisplayWidget::resizeGL(int width, int height){
@@ -76,10 +78,21 @@ void GLDisplayWidget::mouseMoveEvent(QMouseEvent *event)
     qreal dx = event->position().x() - _lastPosMouse.x();
     qreal dy = event->position().y() - _lastPosMouse.y();
 
-    if( event != NULL )
+    //Mouse left click
+    if(event->buttons() == Qt::LeftButton)
     {
         _angleX += dx;
         _angleY += dy;
+        _lastPosMouse = event->pos();
+
+        update();
+    }
+
+    //Mouse right click
+    if(event->buttons() == Qt::RightButton)
+    {
+        _X += dx/100;
+        _Y -= dy/100;
         _lastPosMouse = event->pos();
 
         update();

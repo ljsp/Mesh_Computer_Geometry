@@ -21,6 +21,7 @@ public:
     void resizeGL(int width, int height);
 
     bool isWireFrame = false;
+    bool isInfPoint = false;
     int currentMesh = 0;
     GeometricWorld _geomWorld;
 

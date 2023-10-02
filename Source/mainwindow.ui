@@ -153,6 +153,42 @@
             </rect>
            </property>
           </widget>
+          <widget class="QPushButton" name="color_triangle">
+           <property name="geometry">
+            <rect>
+             <x>20</x>
+             <y>180</y>
+             <width>111</width>
+             <height>25</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Color Triangle</string>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="splitButton">
+           <property name="geometry">
+            <rect>
+             <x>20</x>
+             <y>230</y>
+             <width>101</width>
+             <height>25</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Split Triangle</string>
+           </property>
+          </widget>
+          <widget class="QSpinBox" name="numberSplitSpinBox">
+           <property name="geometry">
+            <rect>
+             <x>150</x>
+             <y>230</y>
+             <width>44</width>
+             <height>26</height>
+            </rect>
+           </property>
+          </widget>
          </widget>
         </widget>
        </item>

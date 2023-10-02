@@ -9,7 +9,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-set(Qt6_DIR "/usr/local/Qt/6.5.2/gcc_64/lib/cmake/Qt6")
+set(Qt6_DIR "/home/lucas/Qt/6.5.3/gcc_64/lib/cmake/Qt6")
 
 find_package(Qt6 COMPONENTS Core Gui OpenGLWidgets REQUIRED)
 
@@ -35,6 +35,7 @@ set(HEADERS
         ${INC_DIR}/GeometricWorld.h
         ${INC_DIR}/Structures.h
         ${INC_DIR}/Utils.h
+        ${INC_DIR}/Mathematics.h
 )
 
 qt_add_executable(${PROJECT_NAME}

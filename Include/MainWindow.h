@@ -19,7 +19,10 @@ public slots:
     void loadFile();
     void saveFile();
     void setWireFrame();
+    void setInfPoint();
     void setCurrentMesh(int index);
+    void setColorTriangle();
+    void splitTriangle();
 
 private:
     Ui::MainWindow *ui;
