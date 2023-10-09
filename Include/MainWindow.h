@@ -20,8 +20,12 @@ public slots:
     void saveFile();
     void setWireFrame();
     void setInfPoint();
+    void setDrawModeNone();
+    void setDrawModeIterator();
+    void setDrawModeCirculator();
+    void drawIteratorCirculatorPrev();
+    void drawIteratorCirculatorNext();
     void setCurrentMesh(int index);
-    void setColorTriangle();
     void splitTriangle();
 
 private:

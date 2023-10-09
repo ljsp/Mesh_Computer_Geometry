@@ -11,6 +11,15 @@
 #include "GeometricWorld.h"
 #include "Mesh.h"
 
+enum DrawMode {
+    DRAW_MESH = 0,
+    DRAW_MESH_ITERATOR = 1,
+    DRAW_MESH_CIRCULATOR = 2,
+    DRAW_MESH_WIREFRAME,
+    DRAW_TRIANGLE,
+    DRAW_INFPOINT
+};
+
 class GLDisplayWidget : public QOpenGLWidget
 {
 public:
@@ -22,6 +31,7 @@ public:
 
     bool isWireFrame = false;
     bool isInfPoint = false;
+    DrawMode drawMode = DRAW_MESH;
     int currentMesh = 0;
     GeometricWorld _geomWorld;
 

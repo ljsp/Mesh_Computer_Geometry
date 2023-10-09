@@ -68,7 +68,7 @@
            <rect>
             <x>10</x>
             <y>20</y>
-            <width>241</width>
+            <width>281</width>
             <height>641</height>
            </rect>
           </property>
@@ -94,7 +94,7 @@
           <widget class="QCheckBox" name="wireframe_checkbox">
            <property name="geometry">
             <rect>
-             <x>20</x>
+             <x>30</x>
              <y>150</y>
              <width>92</width>
              <height>23</height>
@@ -107,9 +107,9 @@
           <widget class="QPushButton" name="load_button">
            <property name="geometry">
             <rect>
-             <x>20</x>
+             <x>30</x>
              <y>110</y>
-             <width>89</width>
+             <width>101</width>
              <height>25</height>
             </rect>
            </property>
@@ -120,9 +120,9 @@
           <widget class="QPushButton" name="save_button">
            <property name="geometry">
             <rect>
-             <x>130</x>
+             <x>170</x>
              <y>110</y>
-             <width>89</width>
+             <width>101</width>
              <height>25</height>
             </rect>
            </property>
@@ -133,7 +133,7 @@
           <widget class="QCheckBox" name="inf_point_checkbox">
            <property name="geometry">
             <rect>
-             <x>120</x>
+             <x>160</x>
              <y>150</y>
              <width>121</width>
              <height>23</height>
@@ -148,46 +148,140 @@
             <rect>
              <x>10</x>
              <y>40</y>
-             <width>221</width>
+             <width>261</width>
              <height>51</height>
             </rect>
            </property>
           </widget>
-          <widget class="QPushButton" name="color_triangle">
+          <widget class="QGroupBox" name="itv_and_cf_box">
            <property name="geometry">
             <rect>
-             <x>20</x>
+             <x>10</x>
              <y>180</y>
-             <width>111</width>
-             <height>25</height>
+             <width>261</width>
+             <height>81</height>
             </rect>
            </property>
-           <property name="text">
-            <string>Color Triangle</string>
+           <property name="title">
+            <string/>
            </property>
+           <widget class="QRadioButton" name="it_cf_radio_cf">
+            <property name="geometry">
+             <rect>
+              <x>170</x>
+              <y>10</y>
+              <width>91</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Circulator</string>
+            </property>
+           </widget>
+           <widget class="QRadioButton" name="it_cf_radio_none">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>10</y>
+              <width>81</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>None</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="it_cf_next_button">
+            <property name="geometry">
+             <rect>
+              <x>140</x>
+              <y>40</y>
+              <width>111</width>
+              <height>25</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Next</string>
+            </property>
+           </widget>
+           <widget class="QRadioButton" name="it_cf_radio_itf">
+            <property name="geometry">
+             <rect>
+              <x>80</x>
+              <y>10</y>
+              <width>81</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Iterator</string>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="it_cf_prev_button">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>40</y>
+              <width>111</width>
+              <height>25</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Prev</string>
+            </property>
+           </widget>
           </widget>
-          <widget class="QPushButton" name="splitButton">
+          <widget class="QGroupBox" name="groupBox_2">
            <property name="geometry">
             <rect>
-             <x>20</x>
-             <y>230</y>
-             <width>101</width>
-             <height>25</height>
+             <x>10</x>
+             <y>280</y>
+             <width>261</width>
+             <height>111</height>
             </rect>
            </property>
-           <property name="text">
-            <string>Split Triangle</string>
+           <property name="title">
+            <string>GroupBox</string>
            </property>
-          </widget>
-          <widget class="QSpinBox" name="numberSplitSpinBox">
-           <property name="geometry">
-            <rect>
-             <x>150</x>
-             <y>230</y>
-             <width>44</width>
-             <height>26</height>
-            </rect>
-           </property>
+           <widget class="QSpinBox" name="numberSplitSpinBox">
+            <property name="geometry">
+             <rect>
+              <x>150</x>
+              <y>70</y>
+              <width>44</width>
+              <height>26</height>
+             </rect>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="splitButton">
+            <property name="geometry">
+             <rect>
+              <x>20</x>
+              <y>70</y>
+              <width>101</width>
+              <height>25</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Split Triangle</string>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="color_triangle">
+            <property name="geometry">
+             <rect>
+              <x>20</x>
+              <y>40</y>
+              <width>111</width>
+              <height>25</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Color Triangle</string>
+            </property>
+           </widget>
           </widget>
          </widget>
         </widget>

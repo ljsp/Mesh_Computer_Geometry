@@ -21,50 +21,80 @@ Mesh::Mesh() {
     faces.emplace_back(2, 1, 0, 2, 3, 4);
 }
 
-void Mesh::drawMesh() {
-    for(int i = 0; i < faces.size(); i++) {
-        glColor3d(0.4,0.4,0.4);
-        glBegin(GL_TRIANGLES);
-        glPointDraw(vertices.at(faces[i].vertices[0]).point);
-        glPointDraw(vertices.at(faces[i].vertices[1]).point);
-        glPointDraw(vertices.at(faces[i].vertices[2]).point);
-        glEnd();
-    }
+Mesh::~Mesh() {
 }
 
-void Mesh::drawMeshIterator() {
-    auto follower = faces_begin();
-    for (auto it = ++faces_begin(); it != faces_past_the_end(); ++it) {
-        glColor3d(0.0,1.0,0.0);
-        glBegin(GL_TRIANGLES);
-        glPointDraw(vertices.at(it.it->vertices[0]).point);
-        glPointDraw(vertices.at(it.it->vertices[1]).point);
-        glPointDraw(vertices.at(it.it->vertices[2]).point);
-        glEnd();
+void Mesh::drawMesh(int drawMode) {
+    double r, g, b;
 
-        glColor3d(1.0,0.0,0.0);
-        glBegin(GL_TRIANGLES);
-        glPointDraw(vertices.at(follower.it->vertices[0]).point);
-        glPointDraw(vertices.at(follower.it->vertices[1]).point);
-        glPointDraw(vertices.at(follower.it->vertices[2]).point);
-        glEnd();
-        follower = it;
+    if(drawMode == 0) {
+        r = 0.8; g = 0.2; b = 0.2;
+        for(int i = 0; i < faces.size(); i++) {
+            drawTriangle(i, r, g, b);
+        }
     }
-}
 
-void Mesh::drawMeshCirculator(int sommetId) {
-    Mesh::Iterator_on_vertices itv(vertices_begin());
-    Mesh::Circulator_on_faces cf(incident_faces(*itv));
-    for(int i = 0; i < 4; i++) {
-        std::cout << cf.it->vertices[0] << " " << cf.it->vertices[1] << " " << cf.it->vertices[2] << std::endl;
-        glColor3d(0.0,1.0,0.0);
+    if(drawMode == 1) {
+        r = 0.3; g = 1.0; b = 0.3;
+        glColor3d(r,g,b);
+        glBegin(GL_TRIANGLES);
+        glPointDraw(vertices.at(itf.it->vertices[0]).point);
+        glPointDraw(vertices.at(itf.it->vertices[1]).point);
+        glPointDraw(vertices.at(itf.it->vertices[2]).point);
+        glEnd();
+
+        r = 0.8; g = 0.2; b = 0.2;
+        for(int i = 0; i < faces.size(); i++) {
+            if(vertices.at(faces[i].vertices[0]).point != vertices.at(itf.it->vertices[0]).point ||
+               vertices.at(faces[i].vertices[1]).point != vertices.at(itf.it->vertices[1]).point ||
+               vertices.at(faces[i].vertices[2]).point != vertices.at(itf.it->vertices[2]).point)
+            {
+                r = 0.8; g = 0.2; b = 0.2;
+                glColor3d(r,g,b);
+                glBegin(GL_TRIANGLES);
+                glPointDraw(vertices.at(faces[i].vertices[0]).point);
+                glPointDraw(vertices.at(faces[i].vertices[1]).point);
+                glPointDraw(vertices.at(faces[i].vertices[2]).point);
+                glEnd();
+            }
+        }
+    }
+
+    if(drawMode == 2) {
+        r = 0.3; g = 0.3; b = 1.0;
+        glColor3d(r,g,b);
         glBegin(GL_TRIANGLES);
         glPointDraw(vertices.at(cf.it->vertices[0]).point);
         glPointDraw(vertices.at(cf.it->vertices[1]).point);
         glPointDraw(vertices.at(cf.it->vertices[2]).point);
         glEnd();
-        ++cf;
+
+        r = 0.8; g = 0.2; b = 0.2;
+        for(int i = 0; i < faces.size(); i++) {
+            if(vertices.at(faces[i].vertices[0]).point != vertices.at(cf.it->vertices[0]).point ||
+               vertices.at(faces[i].vertices[1]).point != vertices.at(cf.it->vertices[1]).point ||
+               vertices.at(faces[i].vertices[2]).point != vertices.at(cf.it->vertices[2]).point)
+            {
+                r = 0.8; g = 0.2; b = 0.2;
+                glColor3d(r,g,b);
+                glBegin(GL_TRIANGLES);
+                glPointDraw(vertices.at(faces[i].vertices[0]).point);
+                glPointDraw(vertices.at(faces[i].vertices[1]).point);
+                glPointDraw(vertices.at(faces[i].vertices[2]).point);
+                glEnd();
+            }
+        }
     }
+
+}
+
+void Mesh::drawTriangle(int i, double r, double g, double b) {
+    glColor3d(r,g,b);
+    glBegin(GL_TRIANGLES);
+    glPointDraw(vertices.at(faces[i].vertices[0]).point);
+    glPointDraw(vertices.at(faces[i].vertices[1]).point);
+    glPointDraw(vertices.at(faces[i].vertices[2]).point);
+    glEnd();
 }
 
 void Mesh::drawMeshWireFrame() {
@@ -111,6 +141,7 @@ void Mesh::drawInfPoint() {
 
 void Mesh::loadOFF(const char *filename, bool isTriangulated) {
     vertices.clear(); faces.clear();
+
     std::ifstream file;
     file.open(filename);
     if(!file.is_open()) {
@@ -155,6 +186,14 @@ void Mesh::loadOFF(const char *filename, bool isTriangulated) {
     file.close();
 }
 
+void Mesh::initializeIteratorsAndCirulators() {
+    itf = this->faces_begin();
+    itv = this->vertices_begin();
+    cf = this->incident_faces(*itv);
+    cv = this->incident_vertices(*itf);
+    std::cout << "Iterator on faces vertices " << itf.it->vertices[0] << " " << itf.it->vertices[1] << " " << itf.it->vertices[2] << std::endl;
+}
+
 void Mesh::insertMap(std::pair<int,int> edge, int faceId, int sommetId) {
     if(map.find(edge) == map.end()) {
         std::pair<int,int> val = std::make_pair(faceId,sommetId);
@@ -188,18 +227,6 @@ void Mesh::saveOFF(QString filename) {
         file << "3 " << faces.at(i).vertices[0] << " " << faces.at(i).vertices[1] << " " << faces.at(i).vertices[2] << "\n";
     }
     file.close();
-}
-
-Mesh::~Mesh() {
-}
-
-void Mesh::drawTriangle(int i) {
-    glColor3d(1.0,0.4,0.4);
-    glBegin(GL_TRIANGLES);
-    glPointDraw(vertices.at(faces[i].vertices[0]).point);
-    glPointDraw(vertices.at(faces[i].vertices[1]).point);
-    glPointDraw(vertices.at(faces[i].vertices[2]).point);
-    glEnd();
 }
 
 double Mesh::orientationTest(Point a, Point b, Point c) {

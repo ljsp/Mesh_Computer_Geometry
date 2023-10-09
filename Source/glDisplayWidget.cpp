@@ -27,6 +27,9 @@ void GLDisplayWidget::initializeGL()
     _geomWorld.addMesh("../Asset/queen.off", true);
     _geomWorld.addMesh("../Asset/cube_maillage_triangles.off", true);
     _geomWorld.addMesh("../Asset/square.off", true);
+    _geomWorld._meshes.at(0).initializeIteratorsAndCirulators();
+    _geomWorld._meshes.at(1).initializeIteratorsAndCirulators();
+    _geomWorld._meshes.at(2).initializeIteratorsAndCirulators();
 }
 
 void GLDisplayWidget::paintGL(){
@@ -46,10 +49,7 @@ void GLDisplayWidget::paintGL(){
     if(isWireFrame) {
         _geomWorld._meshes.at(currentMesh).drawMeshWireFrame();
     } else {
-        _geomWorld._meshes.at(currentMesh).drawMesh();
-        //_geomWorld._meshes.at(currentMesh).drawMeshIterator();
-        //_geomWorld._meshes.at(currentMesh).drawMeshCirculator(0);
-        //_geomWorld._meshes.at(currentMesh).drawTriangle(0);
+        _geomWorld._meshes.at(currentMesh).drawMesh(drawMode);
     }
 
     if(isInfPoint) {
