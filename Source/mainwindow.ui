@@ -18,7 +18,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>../../../../Images/Captures d’écran/Capture d’écran du 2023-09-11 22-00-32.png</normaloff>../../../../Images/Captures d’écran/Capture d’écran du 2023-09-11 22-00-32.png</iconset>
+    <normaloff>../../../../../../../Images/Captures d’écran/Capture d’écran du 2023-09-11 22-00-32.png</normaloff>../../../../../../../Images/Captures d’écran/Capture d’écran du 2023-09-11 22-00-32.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout_2">
@@ -81,7 +81,7 @@
           <widget class="QPushButton" name="exit_button">
            <property name="geometry">
             <rect>
-             <x>70</x>
+             <x>93</x>
              <y>600</y>
              <width>86</width>
              <height>25</height>
@@ -89,19 +89,6 @@
            </property>
            <property name="text">
             <string>Exit</string>
-           </property>
-          </widget>
-          <widget class="QCheckBox" name="wireframe_checkbox">
-           <property name="geometry">
-            <rect>
-             <x>30</x>
-             <y>150</y>
-             <width>92</width>
-             <height>23</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Wireframe</string>
            </property>
           </widget>
           <widget class="QPushButton" name="load_button">
@@ -130,19 +117,6 @@
             <string>Save Mesh</string>
            </property>
           </widget>
-          <widget class="QCheckBox" name="inf_point_checkbox">
-           <property name="geometry">
-            <rect>
-             <x>160</x>
-             <y>150</y>
-             <width>121</width>
-             <height>23</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Infinite Point</string>
-           </property>
-          </widget>
           <widget class="QListWidget" name="object_list">
            <property name="geometry">
             <rect>
@@ -157,7 +131,7 @@
            <property name="geometry">
             <rect>
              <x>10</x>
-             <y>180</y>
+             <y>280</y>
              <width>261</width>
              <height>81</height>
             </rect>
@@ -238,19 +212,19 @@
            <property name="geometry">
             <rect>
              <x>10</x>
-             <y>280</y>
+             <y>370</y>
              <width>261</width>
-             <height>111</height>
+             <height>151</height>
             </rect>
            </property>
            <property name="title">
-            <string>GroupBox</string>
+            <string>Triangle Modifications</string>
            </property>
            <widget class="QSpinBox" name="numberSplitSpinBox">
             <property name="geometry">
              <rect>
-              <x>150</x>
-              <y>70</y>
+              <x>92</x>
+              <y>110</y>
               <width>44</width>
               <height>26</height>
              </rect>
@@ -259,8 +233,8 @@
            <widget class="QPushButton" name="splitButton">
             <property name="geometry">
              <rect>
-              <x>20</x>
-              <y>70</y>
+              <x>142</x>
+              <y>110</y>
               <width>101</width>
               <height>25</height>
              </rect>
@@ -269,17 +243,160 @@
              <string>Split Triangle</string>
             </property>
            </widget>
-           <widget class="QPushButton" name="color_triangle">
+           <widget class="QPushButton" name="flipEdge_Button">
             <property name="geometry">
              <rect>
-              <x>20</x>
-              <y>40</y>
-              <width>111</width>
+              <x>142</x>
+              <y>70</y>
+              <width>101</width>
               <height>25</height>
              </rect>
             </property>
             <property name="text">
-             <string>Color Triangle</string>
+             <string>Flip Edge</string>
+            </property>
+           </widget>
+           <widget class="QSpinBox" name="triangleId_spinBox">
+            <property name="geometry">
+             <rect>
+              <x>92</x>
+              <y>30</y>
+              <width>44</width>
+              <height>26</height>
+             </rect>
+            </property>
+           </widget>
+           <widget class="QSpinBox" name="triangleEdge_spinBox">
+            <property name="geometry">
+             <rect>
+              <x>92</x>
+              <y>70</y>
+              <width>44</width>
+              <height>26</height>
+             </rect>
+            </property>
+            <property name="maximum">
+             <number>3</number>
+            </property>
+           </widget>
+           <widget class="QLabel" name="label">
+            <property name="geometry">
+             <rect>
+              <x>51</x>
+              <y>75</y>
+              <width>41</width>
+              <height>17</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Edge</string>
+            </property>
+           </widget>
+           <widget class="QLabel" name="label_2">
+            <property name="geometry">
+             <rect>
+              <x>8</x>
+              <y>35</y>
+              <width>81</width>
+              <height>20</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Triangle ID</string>
+            </property>
+           </widget>
+           <widget class="QLabel" name="label_3">
+            <property name="geometry">
+             <rect>
+              <x>25</x>
+              <y>116</y>
+              <width>67</width>
+              <height>17</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Nb Splits</string>
+            </property>
+           </widget>
+          </widget>
+          <widget class="QGroupBox" name="groupBox_3">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>142</y>
+             <width>261</width>
+             <height>131</height>
+            </rect>
+           </property>
+           <property name="title">
+            <string>Draw Options</string>
+           </property>
+           <widget class="QCheckBox" name="inf_point_checkbox">
+            <property name="geometry">
+             <rect>
+              <x>140</x>
+              <y>40</y>
+              <width>121</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Infinite Point</string>
+            </property>
+           </widget>
+           <widget class="QCheckBox" name="stitching_checkBox">
+            <property name="geometry">
+             <rect>
+              <x>140</x>
+              <y>70</y>
+              <width>101</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Stitching</string>
+            </property>
+           </widget>
+           <widget class="QRadioButton" name="color_radioButton">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>39</y>
+              <width>112</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Color</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+           <widget class="QRadioButton" name="wireframe_radioButton">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>70</y>
+              <width>92</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Wireframe</string>
+            </property>
+           </widget>
+           <widget class="QRadioButton" name="laplacian_radioButton">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>100</y>
+              <width>112</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Laplacian</string>
             </property>
            </widget>
           </widget>

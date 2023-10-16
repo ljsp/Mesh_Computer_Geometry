@@ -2,6 +2,7 @@
 #define MESH_H
 
 #include <QOpenGLWidget>
+#include "Utils.h"
 #include "Structures.h"
 #include "Mathematics.h"
 
@@ -10,9 +11,13 @@ class Mesh
 public:
     Mesh();
     ~Mesh();
-    void drawMesh(int drawMode);
-    void drawMeshWireFrame();
     void drawTriangle(int i, double r, double g, double b);
+    void drawMesh(DrawMode drawMode);
+    void drawMeshColor();
+    void drawMeshIterator();
+    void drawMeshCirculator();
+    void drawMeshWireFrame();
+    void drawMeshStitching();
     void drawInfPoint();
 
     void initializeIteratorsAndCirulators();
@@ -79,7 +84,6 @@ public:
     Mesh::Circulator_on_faces cf;
     Mesh::Circulator_on_vertices cv;
 
-private:
     std::map<std::pair<int,int>,std::pair<int,int>> map;
     std::vector<Vertex> vertices;
     std::vector<Face> faces;

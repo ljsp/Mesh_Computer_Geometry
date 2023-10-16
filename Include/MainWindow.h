@@ -18,14 +18,16 @@ public:
 public slots:
     void loadFile();
     void saveFile();
-    void setWireFrame();
+    void setDraw();
     void setInfPoint();
+    void setStitching();
     void setDrawModeNone();
     void setDrawModeIterator();
     void setDrawModeCirculator();
     void drawIteratorCirculatorPrev();
     void drawIteratorCirculatorNext();
     void setCurrentMesh(int index);
+    void flipEdge();
     void splitTriangle();
 
 private:

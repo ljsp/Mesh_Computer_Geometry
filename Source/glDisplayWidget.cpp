@@ -46,15 +46,14 @@ void GLDisplayWidget::paintGL(){
 
     glColor3f(0, 1 ,0);
 
-    if(isWireFrame) {
-        _geomWorld._meshes.at(currentMesh).drawMeshWireFrame();
-    } else {
-        _geomWorld._meshes.at(currentMesh).drawMesh(drawMode);
-    }
+    _geomWorld._meshes.at(currentMesh).drawMesh(drawMode);
 
-    if(isInfPoint) {
+    if(isInfPoint)
         _geomWorld._meshes.at(currentMesh).drawInfPoint();
-    }
+
+    if(isStitching)
+        _geomWorld._meshes.at(currentMesh).drawMeshStitching();
+
 }
 
 void GLDisplayWidget::resizeGL(int width, int height){

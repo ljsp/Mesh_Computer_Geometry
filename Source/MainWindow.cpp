@@ -16,8 +16,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->object_list->addItem(QString("square"));
     ui->object_list->connect(ui->object_list, SIGNAL(currentRowChanged(int)), this, SLOT(setCurrentMesh(int)));
 
-    ui->wireframe_checkbox->connect(ui->wireframe_checkbox, SIGNAL(clicked()), this, SLOT(setWireFrame()));
+    ui->color_radioButton->connect(ui->color_radioButton, SIGNAL(clicked()), this, SLOT(setDraw()));
+    ui->wireframe_radioButton->connect(ui->wireframe_radioButton, SIGNAL(clicked()), this, SLOT(setDraw()));
     ui->inf_point_checkbox->connect(ui->inf_point_checkbox, SIGNAL(clicked()), this, SLOT(setInfPoint()));
+    ui->stitching_checkBox->connect(ui->stitching_checkBox, SIGNAL(clicked()), this, SLOT(setStitching()));
 
     ui->load_button->connect(ui->load_button, SIGNAL(clicked()), this, SLOT(loadFile()));
     ui->save_button->connect(ui->save_button, SIGNAL(clicked()), this, SLOT(saveFile()));
@@ -29,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->it_cf_next_button->connect(ui->it_cf_next_button, SIGNAL(clicked()), this, SLOT(drawIteratorCirculatorNext()));
 
     ui->splitButton->connect(ui->splitButton, SIGNAL(clicked()), this, SLOT(splitTriangle()));
+    ui->flipEdge_Button->connect(ui->flipEdge_Button, SIGNAL(clicked()), this, SLOT(flipEdge()));
 }
 
 MainWindow::~MainWindow()
@@ -36,8 +39,9 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::setWireFrame() {
-    ui->widget->isWireFrame = ui->wireframe_checkbox->isChecked();
+void MainWindow::setDraw() {
+    ui->color_radioButton->isChecked() ? ui->widget->drawMode = DRAW_MESH :
+    ui->wireframe_radioButton->isChecked() ? ui->widget->drawMode = DRAW_MESH_WIREFRAME : ui->widget->drawMode = DRAW_MESH;
 }
 
 void MainWindow::loadFile() {
@@ -62,6 +66,10 @@ void MainWindow::setCurrentMesh(int index) {
 
 void MainWindow::setInfPoint() {
     ui->widget->isInfPoint = ui->inf_point_checkbox->isChecked();
+}
+
+void MainWindow::setStitching() {
+    ui->widget->isStitching = ui->stitching_checkBox->isChecked();
 }
 
 void MainWindow::setDrawModeNone() {
@@ -92,17 +100,24 @@ void MainWindow::drawIteratorCirculatorNext() {
         ++ui->widget->_geomWorld._meshes.at(ui->widget->currentMesh).cf;
 }
 
+void MainWindow::flipEdge() {
+    int idFace = ui->triangleId_spinBox->value();
+    int idEdge = ui->triangleEdge_spinBox->value();
+
+    int neighbourFace = ui->widget->_geomWorld._meshes.at(ui->widget->currentMesh).faces.at(idFace).adjacentTrianglesId[idEdge];
+    ui->widget->_geomWorld._meshes.at(ui->widget->currentMesh).flipEdge(idFace, neighbourFace);
+}
+
 void MainWindow::splitTriangle() {
 
-    /*int numberSplit = ui->numberSplitSpinBox->value();
+    int numberSplit = ui->numberSplitSpinBox->value();
+    int idFace = ui->triangleId_spinBox->value();
     for (int i = 0; i < numberSplit; ++i) {
         double x = (double) rand() / RAND_MAX;
         double y = (double) rand() / RAND_MAX;
         int face = rand() % 2;
 
-        ui->widget->_geomWorld._meshes.at(ui->widget->currentMesh).splitTriangle(face,Point(x,y,0));
-    }*/
-
-    ui->widget->_geomWorld._meshes.at(ui->widget->currentMesh).flipEdge(0,1);
+        ui->widget->_geomWorld._meshes.at(ui->widget->currentMesh).splitTriangle(idFace,Point(x,y,0));
+    }
 }
 
