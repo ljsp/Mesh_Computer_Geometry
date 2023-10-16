@@ -62,18 +62,19 @@ void Mesh::drawMeshColor() {
 
 void Mesh::drawMeshIterator() {
     double r = 0.3; double g = 1.0; double b = 0.3;
+
     glColor3d(r,g,b);
     glBegin(GL_TRIANGLES);
-    glPointDraw(vertices.at(itf.it->vertices[0]).point);
-    glPointDraw(vertices.at(itf.it->vertices[1]).point);
-    glPointDraw(vertices.at(itf.it->vertices[2]).point);
+    glPointDraw(vertices.at(itf->vertices[0]).point);
+    glPointDraw(vertices.at(itf->vertices[1]).point);
+    glPointDraw(vertices.at(itf->vertices[2]).point);
     glEnd();
 
     r = 0.8; g = 0.2; b = 0.2;
     for(int i = 0; i < faces.size(); i++) {
-        if(vertices.at(faces[i].vertices[0]).point != vertices.at(itf.it->vertices[0]).point ||
-           vertices.at(faces[i].vertices[1]).point != vertices.at(itf.it->vertices[1]).point ||
-           vertices.at(faces[i].vertices[2]).point != vertices.at(itf.it->vertices[2]).point)
+        if(vertices.at(faces[i].vertices[0]).point != vertices.at(itf->vertices[0]).point ||
+           vertices.at(faces[i].vertices[1]).point != vertices.at(itf->vertices[1]).point ||
+           vertices.at(faces[i].vertices[2]).point != vertices.at(itf->vertices[2]).point)
         {
             r = 0.8; g = 0.2; b = 0.2;
             drawTriangle(i, r, g, b);
@@ -83,18 +84,19 @@ void Mesh::drawMeshIterator() {
 
 void Mesh::drawMeshCirculator() {
     double r = 0.3; double g = 0.3; double b = 1.0;
+
     glColor3d(r,g,b);
     glBegin(GL_TRIANGLES);
-    glPointDraw(vertices.at(cf.it->vertices[0]).point);
-    glPointDraw(vertices.at(cf.it->vertices[1]).point);
-    glPointDraw(vertices.at(cf.it->vertices[2]).point);
+    glPointDraw(vertices.at(cf->vertices[0]).point);
+    glPointDraw(vertices.at(cf->vertices[1]).point);
+    glPointDraw(vertices.at(cf->vertices[2]).point);
     glEnd();
 
     r = 0.8; g = 0.2; b = 0.2;
     for(int i = 0; i < faces.size(); i++) {
-        if(vertices.at(faces[i].vertices[0]).point != vertices.at(cf.it->vertices[0]).point ||
-           vertices.at(faces[i].vertices[1]).point != vertices.at(cf.it->vertices[1]).point ||
-           vertices.at(faces[i].vertices[2]).point != vertices.at(cf.it->vertices[2]).point)
+        if(vertices.at(faces[i].vertices[0]).point != vertices.at(cf->vertices[0]).point ||
+           vertices.at(faces[i].vertices[1]).point != vertices.at(cf->vertices[1]).point ||
+           vertices.at(faces[i].vertices[2]).point != vertices.at(cf->vertices[2]).point)
         {
             r = 0.8; g = 0.2; b = 0.2;
             glColor3d(r,g,b);
@@ -230,10 +232,10 @@ void Mesh::loadOFF(const char *filename, bool isTriangulated) {
 }
 
 void Mesh::initializeIteratorsAndCirulators() {
-    itf = this->faces_begin();
-    itv = this->vertices_begin();
-    cf = this->incident_faces(*itv);
-    cv = this->incident_vertices(*itf);
+    itf = faces_begin();
+    itv = vertices_begin();
+    cf = incident_faces(*itv);
+    cv = incident_vertices(*itv);
 }
 
 void Mesh::insertMap(std::pair<int,int> edge, int faceId, int sommetId) {
