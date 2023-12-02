@@ -40,6 +40,7 @@ public:
     ~Face();
     int vertices[3];
     int adjacentTrianglesId[3];
+    Point normal;
 private:
 };
 
@@ -49,6 +50,7 @@ public:
     ~Vertex();
     Point point;
     int triangleId;
+    double laplacian;
 private:
 };
 

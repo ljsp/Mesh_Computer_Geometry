@@ -18,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->color_radioButton->connect(ui->color_radioButton, SIGNAL(clicked()), this, SLOT(setDraw()));
     ui->wireframe_radioButton->connect(ui->wireframe_radioButton, SIGNAL(clicked()), this, SLOT(setDraw()));
+    ui->laplacian_radioButton->connect(ui->laplacian_radioButton, SIGNAL(clicked()), this, SLOT(setDraw()));
     ui->inf_point_checkbox->connect(ui->inf_point_checkbox, SIGNAL(clicked()), this, SLOT(setInfPoint()));
     ui->stitching_checkBox->connect(ui->stitching_checkBox, SIGNAL(clicked()), this, SLOT(setStitching()));
 
@@ -40,8 +41,9 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::setDraw() {
-    ui->color_radioButton->isChecked() ? ui->widget->drawMode = DRAW_MESH :
-    ui->wireframe_radioButton->isChecked() ? ui->widget->drawMode = DRAW_MESH_WIREFRAME : ui->widget->drawMode = DRAW_MESH;
+    if(ui->color_radioButton    ->isChecked()) { ui->widget->drawMode = DRAW_MESH          ; }
+    if(ui->wireframe_radioButton->isChecked()) { ui->widget->drawMode = DRAW_MESH_WIREFRAME; }
+    if(ui->laplacian_radioButton->isChecked()) { ui->widget->drawMode = DRAW_MESH_LAPLACIAN; }
 }
 
 void MainWindow::loadFile() {

@@ -30,6 +30,12 @@ void GLDisplayWidget::initializeGL()
     _geomWorld._meshes.at(0).initializeIteratorsAndCirulators();
     _geomWorld._meshes.at(1).initializeIteratorsAndCirulators();
     _geomWorld._meshes.at(2).initializeIteratorsAndCirulators();
+
+    _geomWorld._meshes.at(0).computeNormals();
+
+    _geomWorld._meshes.at(0).computeLaplacian();
+    //_geomWorld._meshes.at(1).computeLaplacian();
+    //_geomWorld._meshes.at(2).computeLaplacian();
 }
 
 void GLDisplayWidget::paintGL(){

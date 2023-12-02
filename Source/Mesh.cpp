@@ -36,7 +36,7 @@ void Mesh::drawTriangle(int i, double r, double g, double b) {
 void Mesh::drawMesh(DrawMode drawMode) {
     switch (drawMode) {
         case DRAW_MESH:
-            drawMeshColor();
+            drawMeshNormals();
             break;
         case DRAW_MESH_ITERATOR:
             drawMeshIterator();
@@ -46,6 +46,12 @@ void Mesh::drawMesh(DrawMode drawMode) {
             break;
         case DRAW_MESH_WIREFRAME:
             drawMeshWireFrame();
+            break;
+        case DRAW_MESH_LAPLACIAN:
+            drawMeshLaplacian();
+            break;
+        case DRAW_MESH_NORMALS:
+            drawMeshNormals();
             break;
         default:
             drawMeshColor();
@@ -118,6 +124,19 @@ void Mesh::drawMeshWireFrame() {
         glEnd();
         glBegin(GL_LINE_STRIP);
         glPointDraw(vertices.at(faces[i].vertices[0]).point);
+        glPointDraw(vertices.at(faces[i].vertices[2]).point);
+        glEnd();
+    }
+}
+
+void Mesh::drawMeshNormals() {
+    for(int i = 0; i < faces.size(); i++) {
+        glColor3d(faces.at(i).normal._x,
+                  faces.at(i).normal._y,
+                  faces.at(i).normal._z);
+        glBegin(GL_TRIANGLES);
+        glPointDraw(vertices.at(faces[i].vertices[0]).point);
+        glPointDraw(vertices.at(faces[i].vertices[1]).point);
         glPointDraw(vertices.at(faces[i].vertices[2]).point);
         glEnd();
     }
@@ -273,6 +292,102 @@ void Mesh::saveOFF(QString filename) {
     file.close();
 }
 
+double angleBetween(const Point& a, const Point& b) {
+    double dotProduct = a._x * b._x + a._y * b._y + a._z * b._z;
+    double normA = sqrt(a._x * a._x + a._y * a._y + a._z * a._z);
+    double normB = sqrt(b._x * b._x + b._y * b._y + b._z * b._z);
+    return acos(dotProduct / (normA * normB));
+}
+
+double triangleArea(const Point& p1, const Point& p2, const Point& p3) {
+    Point vec1 = p2 - p1;
+    Point vec2 = p3 - p1;
+    Point cross = Math::Cross(vec1, vec2);
+    return 0.5 * Math::Norm(cross);
+}
+
+double Mesh::laplacianOfVertex(int idVertex) {
+    Vertex pivot = vertices.at(idVertex);
+
+    Circulator_on_vertices circulator(this, pivot);
+    circulator++;
+    unsigned int firstNeighbour = circulator.indice();
+    Point laplacian = {0, 0, 0};
+    double areaSum = 0;
+
+    do {
+        Vertex current = vertices.at(circulator.indice());
+        Vertex next = vertices.at((circulator++).indice());
+
+        // Calcul des angles opposés pour la cotangente.
+        double angleCurrent = angleBetween(next.point - pivot.point, next.point - current.point);
+        double angleNext = angleBetween(current.point - pivot.point, current.point - next.point);
+
+        // Ajout à la somme pondérée par les cotangentes.
+        laplacian._x += (1 / tan(angleCurrent) + 1 / tan(angleNext)) * (current.point._x - pivot.point._x);
+        laplacian._y += (1 / tan(angleCurrent) + 1 / tan(angleNext)) * (current.point._y - pivot.point._y);
+        laplacian._z += (1 / tan(angleCurrent) + 1 / tan(angleNext)) * (current.point._z - pivot.point._z);
+
+        // Calcul de l'aire pour la normalisation.
+        areaSum += triangleArea(pivot.point, current.point, next.point);
+
+        circulator++;
+    } while (circulator.indice() != firstNeighbour);
+
+    // Normalisation.
+    laplacian._x /= (2 * areaSum);
+    laplacian._y /= (2 * areaSum);
+    laplacian._z /= (2 * areaSum);
+
+    return sqrt(laplacian._x * laplacian._x + laplacian._y * laplacian._y + laplacian._z * laplacian._z);
+}
+
+void Mesh::computeLaplacian() {
+    double max = 0;
+    for (int i = 0; i < vertices.size(); ++i) {
+        double val = laplacianOfVertex(i);
+        vertices[i].laplacian = val;
+        if (val > max) {
+            max = val;
+        }
+    }
+
+    for (int i = 0; i < vertices.size(); ++i) {
+        vertices[i].laplacian /= max;
+        //printf("%f\n", vertices[i].laplacian);
+    }
+
+    //printf("Max : %f\n", max);
+}
+
+std::array<float, 3> courbure2RGB(float H){
+    float X = (1 - std::abs(fmod( H / 60, 2) - 1));
+
+    if(H < 60) return {0, X,1};
+    if(H < 120) return {0, 1,X};
+    if(H < 180) return {X, 1,0};
+    if(H < 240) return {1, X,0};
+    if(H < 300) return {1, 0,X};
+    if(H < 360) return {X, 0,1};
+
+    float V =  1 - 1 / ( 1 + H / 10);
+    return {V, V, V};
+}
+
+
+void Mesh::drawMeshLaplacian() {
+    for (int i = 0; i < faces.size(); ++i) {
+        glBegin(GL_TRIANGLES);
+        for(int j = 0; j < 3; j++){
+            int id = faces[i].vertices[j];
+            std::array<float, 3> rgb = courbure2RGB(vertices[id].laplacian * 360);
+            glColor3f(rgb[0], rgb[1], rgb[2]);
+            glPointDraw(vertices[id].point);
+        }
+        glEnd();
+    }
+}
+
 double Mesh::orientationTest(Point a, Point b, Point c) {
     return a._x*(b._y - c._y) + b._x*(c._y - a._y) + c._x*(a._y - c._y);
 }
@@ -378,4 +493,16 @@ void Mesh::splitTriangle(int face, Point p) {
     vertices.at(v2).triangleId = t4;
     vertices.at(v3).triangleId = t4;
 
+}
+
+void Mesh::computeNormals() {
+    for(int i = 0; i < faces.size(); i++) {
+        Point a = vertices.at(faces.at(i).vertices[0]).point;
+        Point b = vertices.at(faces.at(i).vertices[1]).point;
+        Point c = vertices.at(faces.at(i).vertices[2]).point;
+        Point normal = Math::Cross(b-a, c-a);
+        normal = Math::Normalize(normal);
+        faces.at(i).normal = normal;
+        //printf("Face %d : %f %f %f\n", i, normal._x, normal._y, normal._z);
+    }
 }
