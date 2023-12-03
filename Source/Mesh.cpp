@@ -203,6 +203,34 @@ void Mesh::drawInfPoint() {
     }
 }
 
+std::array<float, 3> colorMap(float val){
+    float X = (1 - std::abs(fmod( val / 60, 2) - 1));
+
+    if(val < 60) return {0, X,1};
+    if(val < 120) return {0, 1,X};
+    if(val < 180) return {X, 1,0};
+    if(val < 240) return {1, X,0};
+    if(val < 300) return {1, 0,X};
+    if(val < 360) return {X, 0,1};
+
+    float V =  1 - 1 / ( 1 + val / 10);
+    return {V, V, V};
+}
+
+void Mesh::drawMeshLaplacian() {
+    for (int i = 0; i < faces.size(); ++i) {
+        glBegin(GL_TRIANGLES);
+        for(int j = 0; j < 3; j++){
+            int id = faces[i].vertices[j];
+            double val = Math::Norm(vertices[id].laplacian);
+            std::array<float, 3> rgb = colorMap(val);
+            glColor3f(rgb[0], rgb[1], rgb[2]);
+            glPointDraw(vertices[id].point);
+        }
+        glEnd();
+    }
+}
+
 void Mesh::loadOFF(const char *filename, bool isTriangulated) {
     vertices.clear(); faces.clear();
 
@@ -292,99 +320,88 @@ void Mesh::saveOFF(QString filename) {
     file.close();
 }
 
-double angleBetween(const Point& a, const Point& b) {
-    double dotProduct = a._x * b._x + a._y * b._y + a._z * b._z;
-    double normA = sqrt(a._x * a._x + a._y * a._y + a._z * a._z);
-    double normB = sqrt(b._x * b._x + b._y * b._y + b._z * b._z);
-    return acos(dotProduct / (normA * normB));
+double cotan(const Point& a, const Point& b) {
+    return Math::Dot(a,b) / Math::Norm(Math::Cross(a,b));
 }
 
 double triangleArea(const Point& p1, const Point& p2, const Point& p3) {
     Point vec1 = p2 - p1;
     Point vec2 = p3 - p1;
     Point cross = Math::Cross(vec1, vec2);
-    return 0.5 * Math::Norm(cross);
+    return Math::Norm(cross);
 }
 
-double Mesh::laplacianOfVertex(int idVertex) {
-    Vertex pivot = vertices.at(idVertex);
-
-    Circulator_on_vertices circulator(this, pivot);
-    circulator++;
-    unsigned int firstNeighbour = circulator.indice();
-    Point laplacian = {0, 0, 0};
-    double areaSum = 0;
-
+double Mesh::calculateAreaFacei(Vertex v){
+    Circulator_on_faces cf = incident_faces(v);
+    Circulator_on_faces cfbegin = cf;
+    double area = 0;
     do {
-        Vertex current = vertices.at(circulator.indice());
-        Vertex next = vertices.at((circulator++).indice());
+        Face f = faces[cf.indice()];
+        Point p1 = vertices[f.vertices[0]].point;
+        Point p2 = vertices[f.vertices[1]].point;
+        Point p3 = vertices[f.vertices[2]].point;
+        area += triangleArea(p1, p2, p3);
+    } while(cf.indice() != cfbegin.indice());
+    return area / 3.0;
+}
 
-        // Calcul des angles opposés pour la cotangente.
-        double angleCurrent = angleBetween(next.point - pivot.point, next.point - current.point);
-        double angleNext = angleBetween(current.point - pivot.point, current.point - next.point);
+std::vector<int> Mesh::firstRing(int idVertex) {
+    std::vector<int> firstRing;
+    Circulator_on_vertices cv = incident_vertices(vertices.at(idVertex));
+    Circulator_on_vertices cvBegin = cv;
+    do {
+        firstRing.push_back(cv.indice());
+        cv++;
+    } while(cv.indice() != cvBegin.indice());
+    return firstRing;
+}
 
-        // Ajout à la somme pondérée par les cotangentes.
-        laplacian._x += (1 / tan(angleCurrent) + 1 / tan(angleNext)) * (current.point._x - pivot.point._x);
-        laplacian._y += (1 / tan(angleCurrent) + 1 / tan(angleNext)) * (current.point._y - pivot.point._y);
-        laplacian._z += (1 / tan(angleCurrent) + 1 / tan(angleNext)) * (current.point._z - pivot.point._z);
+Point Mesh::laplacianOfVertex(int vertexId) {
 
-        // Calcul de l'aire pour la normalisation.
-        areaSum += triangleArea(pivot.point, current.point, next.point);
+    Vertex vertex_i = vertices.at(vertexId);
 
-        circulator++;
-    } while (circulator.indice() != firstNeighbour);
+    Point laplacian = Point(0,0,0);
 
-    // Normalisation.
-    laplacian._x /= (2 * areaSum);
-    laplacian._y /= (2 * areaSum);
-    laplacian._z /= (2 * areaSum);
+    std::vector<int> firstRing = this->firstRing(vertexId);
+    int neighbours = firstRing.size();
 
-    return sqrt(laplacian._x * laplacian._x + laplacian._y * laplacian._y + laplacian._z * laplacian._z);
+    for (int i = 0; i < neighbours; ++i) {
+
+        int id_j = firstRing[i];
+        int id_j_next = firstRing[(i + 1) % neighbours];
+        int id_j_prev = firstRing[(i - 1 + neighbours) % neighbours];
+
+        Vertex vertex_j = vertices.at(id_j);
+        Vertex vertex_j_next = vertices.at(id_j_next);
+        Vertex vertex_j_prev = vertices.at(id_j_prev);
+
+        Point v1 = vertex_i.point - vertex_j_prev.point;
+        Point v2 = vertex_j.point - vertex_j_prev.point;
+        Point v3 = vertex_i.point - vertex_j_next.point;
+        Point v4 = vertex_j.point - vertex_j_next.point;
+
+        double cotAlpha = cotan(v1, v2);
+        double cotBeta = cotan(v3, v4);
+
+        laplacian._x += (cotAlpha + cotBeta) * (vertex_i.point._x - vertex_j.point._x);
+        laplacian._y += (cotAlpha + cotBeta) * (vertex_i.point._y - vertex_j.point._y);
+        laplacian._z += (cotAlpha + cotBeta) * (vertex_i.point._z - vertex_j.point._z);
+    }
+
+    double Ai = calculateAreaFacei(vertex_i);
+
+    laplacian._x = 1/(2*Ai) * laplacian._x;
+    laplacian._y = 1/(2*Ai) * laplacian._y;
+    laplacian._z = 1/(2*Ai) * laplacian._z;
+
+    return laplacian;
 }
 
 void Mesh::computeLaplacian() {
-    double max = 0;
     for (int i = 0; i < vertices.size(); ++i) {
-        double val = laplacianOfVertex(i);
+        Point val = laplacianOfVertex(i);
         vertices[i].laplacian = val;
-        if (val > max) {
-            max = val;
-        }
-    }
-
-    for (int i = 0; i < vertices.size(); ++i) {
-        vertices[i].laplacian /= max;
-        //printf("%f\n", vertices[i].laplacian);
-    }
-
-    //printf("Max : %f\n", max);
-}
-
-std::array<float, 3> courbure2RGB(float H){
-    float X = (1 - std::abs(fmod( H / 60, 2) - 1));
-
-    if(H < 60) return {0, X,1};
-    if(H < 120) return {0, 1,X};
-    if(H < 180) return {X, 1,0};
-    if(H < 240) return {1, X,0};
-    if(H < 300) return {1, 0,X};
-    if(H < 360) return {X, 0,1};
-
-    float V =  1 - 1 / ( 1 + H / 10);
-    return {V, V, V};
-}
-
-
-void Mesh::drawMeshLaplacian() {
-    for (int i = 0; i < faces.size(); ++i) {
-        glBegin(GL_TRIANGLES);
-        for(int j = 0; j < 3; j++){
-            int id = faces[i].vertices[j];
-            std::array<float, 3> rgb = courbure2RGB(vertices[id].laplacian * 360);
-            glColor3f(rgb[0], rgb[1], rgb[2]);
-            glPointDraw(vertices[id].point);
-        }
-        glEnd();
+        //printf("Laplacian of vertex %d : (%f, %f, %f)\n", i, val._x, val._y, val._z);
     }
 }
 

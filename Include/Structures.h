@@ -50,7 +50,7 @@ public:
     ~Vertex();
     Point point;
     int triangleId;
-    double laplacian;
+    Point laplacian;
 private:
 };
 

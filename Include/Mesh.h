@@ -36,10 +36,10 @@ public:
     void computeNormals();
     void drawMeshNormals();
 
-    double laplacianOfVertex(int idVertex);
+    double calculateAreaFacei(Vertex v);
+    Point laplacianOfVertex(int idVertex);
     std::vector<int> firstRing(int idVertex);
     void computeLaplacian();
-    Point colormap(double value);
 
     void flipEdge(int face0, int face1);
     void findCommonEdge(int face0, int face1, int &sharedPoint1, int &sharedPoint2,

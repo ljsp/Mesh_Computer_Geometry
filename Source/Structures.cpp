@@ -22,7 +22,7 @@ Face::~Face() {
 }
 
 Vertex::Vertex(Point p, int triId) : point(p), triangleId(triId) {
-    laplacian = 0;
+    laplacian = Point(0, 0, 0);
 }
 
 Vertex::~Vertex() {
