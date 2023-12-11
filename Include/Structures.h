@@ -36,11 +36,12 @@ public:
 
 class Face {
 public:
-    Face(int v1, int v2, int v3, int tri1, int tri2, int tri3);
+    Face(int v1, int v2, int v3, int tri1 = -1, int tri2=-1,int tri3=-1, bool infinite = true);
     ~Face();
     int vertices[3];
     int adjacentTrianglesId[3];
     Point normal;
+    bool isInfinite;
 private:
 };
 

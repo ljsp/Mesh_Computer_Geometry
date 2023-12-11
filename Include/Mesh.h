@@ -47,6 +47,8 @@ public:
     double orientationTest(Point a, Point b, Point c);
     bool inTriangle(int triId, Point p);
     void splitTriangle(int face, Point p);
+    int indexFacePointInside(Point P);
+    int foundFace(int a, int b);
 
     struct Iterator_on_faces
     {

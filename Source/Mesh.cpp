@@ -113,7 +113,9 @@ void Mesh::drawMeshCirculator() {
 
 void Mesh::drawMeshWireFrame() {
     for(int i = 0; i < faces.size(); i++) {
-        glColor3d(0.4,0.4,0.4);
+        glColor3d(faces.at(i).normal._x,
+                  faces.at(i).normal._y,
+                  faces.at(i).normal._z);
         glBegin(GL_LINE_STRIP);
         glPointDraw(vertices.at(faces[i].vertices[0]).point);
         glPointDraw(vertices.at(faces[i].vertices[1]).point);
@@ -203,7 +205,7 @@ void Mesh::drawInfPoint() {
     }
 }
 
-std::array<float, 3> colorMap(float val){
+std::array<float, 3> HSV(float val){
     float X = (1 - std::abs(fmod( val / 60, 2) - 1));
 
     if(val < 60) return {0, X,1};
@@ -223,7 +225,7 @@ void Mesh::drawMeshLaplacian() {
         for(int j = 0; j < 3; j++){
             int id = faces[i].vertices[j];
             double val = Math::Norm(vertices[id].laplacian);
-            std::array<float, 3> rgb = colorMap(val);
+            std::array<float, 3> rgb = HSV(val);
             glColor3f(rgb[0], rgb[1], rgb[2]);
             glPointDraw(vertices[id].point);
         }
@@ -409,30 +411,91 @@ double Mesh::orientationTest(Point a, Point b, Point c) {
     return a._x*(b._y - c._y) + b._x*(c._y - a._y) + c._x*(a._y - c._y);
 }
 
-void Mesh::flipEdge(int face0, int face1) {
-    Face f0 = faces.at(face0);
-    Face f1 = faces.at(face1);
+int Orientation(Point a, Point b, Point c){
 
-    int sharedPoint1, sharedPoint2, uniquePointF0, uniquePointF1;
-    findCommonEdge(face0, face1, sharedPoint1, sharedPoint2, uniquePointF0, uniquePointF1);
-    if (sharedPoint1 == -1 || sharedPoint2 == -1 || uniquePointF0 == -1 || uniquePointF1 == -1) {
-        return;
+    double dx1 = b._x - a._x;
+    double dy1 = b._y - a._y;
+    double dx2 = c._x - a._x;
+    double dy2 = c._y - a._y;
+
+    double crossProduct = (dx1 * dy2) - (dx2 * dy1);
+
+    if (crossProduct > 0) {
+        return 1.0; // Counter-clockwise
+    } else if (crossProduct < 0) {
+        return -1.0; // Clockwise
+    } else {
+        return 0.0; // Aligned
+    }
+}
+
+int Mesh::foundFace(int a, int b) {
+    for (int i = 0; i < faces.size(); i++) {
+        if(faces[i].isInfinite){
+            int vertices[3] = {faces[i].vertices[0], faces[i].vertices[1], faces[i].vertices[2]};
+            // Vérifiez si les sommets a et b appartiennent à ce triangle
+            if ((a == vertices[0] || a == vertices[1] || a == vertices[2]) &&
+                (b == vertices[0] || b == vertices[1] || b == vertices[2])) {
+                return i; // Retourne l'indice de la face
+            }
+        }
+    }
+    return -1; // Aucune face trouvée
+}
+
+void Mesh::flipEdge(int a, int b) {
+    int AoppB, BoppA = -1;
+    for(int i = 0; i< 3; i++){
+        if(faces[a].adjacentTrianglesId[i] == b){
+            AoppB = i;
+            break;
+        }
     }
 
-    int t1 = f0.adjacentTrianglesId[0];
-    int t5 = f0.adjacentTrianglesId[1];
-    int t4 = f0.adjacentTrianglesId[2];
-    int t2 = f1.adjacentTrianglesId[0];
-    int t0 = f1.adjacentTrianglesId[1];
-    int t3 = f1.adjacentTrianglesId[2];
+    for(int i = 0; i< 3; i++){
+        if(faces[b].adjacentTrianglesId[i] == a){
+            BoppA = i;
+            break;
+        }
+    }
 
-    faces.at(face0) = Face(sharedPoint1, uniquePointF1, uniquePointF0, t3, t4, t1);
-    faces.at(face1) = Face(sharedPoint2, uniquePointF1, uniquePointF0, t2, t0, t5);
+    //Store zone
 
-    vertices.at(sharedPoint1).triangleId = face0;
-    vertices.at(sharedPoint2).triangleId = face1;
-    vertices.at(uniquePointF0).triangleId = face0;
-    vertices.at(uniquePointF1).triangleId = face1;
+    faces[a].vertices[(AoppB+2)%3] = faces[b].vertices[BoppA];
+    faces[b].vertices[(BoppA+2)%3] = faces[a].vertices[AoppB];
+
+
+    //modifier les adjacence
+    faces[a].adjacentTrianglesId[AoppB] = faces[b].adjacentTrianglesId[(BoppA+1)%3];
+    faces[b].adjacentTrianglesId[BoppA] = faces[a].adjacentTrianglesId[(AoppB+1)%3];
+
+    faces[a].adjacentTrianglesId[(AoppB+1)%3] = b;
+    faces[b].adjacentTrianglesId[(BoppA+1)%3] = a;
+
+    int opposeHorsB = -1, opposeHorsA =-1;
+    for(int i = 0; i< 3; i++){
+        if(faces[b].adjacentTrianglesId[BoppA] != -1){
+            if(faces[faces[b].adjacentTrianglesId[BoppA]].adjacentTrianglesId[i] == a){
+                opposeHorsB = i;
+                break;
+            }
+        }
+    }
+
+    for(int i = 0; i< 3; i++){
+        if(faces[a].adjacentTrianglesId[AoppB] != -1){
+            if(faces[faces[a].adjacentTrianglesId[AoppB]].adjacentTrianglesId[i] == b){
+                opposeHorsA = i;
+                break;
+            }
+        }
+    }
+
+    if(opposeHorsB!=-1)
+        faces[faces[b].adjacentTrianglesId[BoppA]].adjacentTrianglesId[opposeHorsB] = b;
+    if(opposeHorsA!=-1)
+        faces[faces[a].adjacentTrianglesId[AoppB]].adjacentTrianglesId[opposeHorsA] = a;
+
 }
 
 void Mesh::findCommonEdge(int face0, int face1, int &sharedPoint1, int &sharedPoint2, int &uniquePointF0, int &uniquePointF1) {
@@ -484,31 +547,169 @@ bool Mesh::inTriangle(int triId, Point p) {
     return (dotABAP >= 0 && dotBCBP >= 0 && dotCACP >=  0);
 }
 
-void Mesh::splitTriangle(int face, Point p) {
-    if(!inTriangle(face, p)) {
-        std::cout << "Point not in triangle" << std::endl;
-        return;
+// Fonction pour vérifier la position d'un point par rapport à un triangle.
+int pointPosition(const Point& A, const Point& B, const Point& C, const Point& P) {
+    // Calculez l'orientation des trois côtés du triangle.
+    int orientABP = Orientation(A, B, P);
+    int orientBCP = Orientation(B, C, P);
+    int orientCAP = Orientation(C, A, P);
+
+    // Vérifiez si le point est situé à l'intérieur du triangle.
+    if (orientABP == orientBCP && orientBCP == orientCAP) {
+        if (orientABP == 0) {
+            return 0; // Le point est sur un bord du triangle.
+        } else {
+            return 1; // Le point est à l'intérieur du triangle.
+        }
     }
 
-    int v1 = faces.at(face).vertices[0];
-    int v2 = faces.at(face).vertices[1];
-    int v3 = faces.at(face).vertices[2];
+    return -1; // Le point est à l'extérieur du triangle.
+}
 
-    int t1 = faces.at(face).adjacentTrianglesId[0];
-    int t2 = faces.at(face).adjacentTrianglesId[1];
-    int t3 = faces.at(face).adjacentTrianglesId[2];
 
-    int v4 = vertices.size();
-    vertices.emplace_back(p, -1);
+int Mesh::indexFacePointInside(Point P){
+    for (int i = 0; i < faces.size(); i++) {
+        if(faces[i].isInfinite){
+            const Point& A = vertices[faces[i].vertices[0]].point;
+            const Point& B = vertices[faces[i].vertices[1]].point;
+            const Point& C = vertices[faces[i].vertices[2]].point;
 
-    int t4 = faces.size();
-    faces.emplace_back(v1, v2, v4, t1, t4, -1);
-    faces.emplace_back(v2, v3, v4, t2, t4, -1);
-    faces.emplace_back(v3, v1, v4, t3, t4, -1);
+            int result = pointPosition(A, B, C, P);
+            if (result == 1) {
+                return i; // Le point est à l'intérieur de la face.
+            }
+        }
+    }
+    return -1; // Aucune face ne contient le point.
+}
 
-    vertices.at(v1).triangleId = t4;
-    vertices.at(v2).triangleId = t4;
-    vertices.at(v3).triangleId = t4;
+void Mesh::splitTriangle(int face, Point p) {
+    int indFace = indexFacePointInside(p);
+    vertices.push_back(Vertex(p,indFace)); //avant ou pendant le if ??
+    int idNewVertice = vertices.size()-1;
+    if(indFace == -1){
+        std::cout << "insert infinite face point : " << p._x << "  " << p._y << std::endl;
+        Circulator_on_faces cicFace1 = incident_faces(vertices.at(0));
+        while(Orientation(vertices[faces[cicFace1.idFace].vertices[0]].point , p,  vertices[faces[cicFace1.idFace].vertices[2]].point) == 1){
+            ++cicFace1;         //ne pas commencer a circuler sur une arrete qui dois devenir un nouveau triangle
+        }                       //car celle d'avant peut aussi en etre une mais notre bool sera sur false;
+        Circulator_on_faces cicFace2 = cicFace1;
+        Circulator_on_faces cicFace0 = cicFace1;
+        --cicFace0;
+        Circulator_on_faces cicBegin = cicFace1;
+
+        bool previousWasCreated = false;
+        do{
+
+            ++cicFace2;
+            std::cout << "passage boucle circ infinite add point  " <<cicFace1.idFace << std::endl;
+            int idCurrentFace = cicFace1.idFace;
+            int indV1 = faces[idCurrentFace].vertices[0];
+            int indV2 = faces[idCurrentFace].vertices[2];
+            if(Orientation(vertices[indV1].point , p,  vertices[indV2].point) == 1){
+                int indFaceAdja = foundFace(indV1,indV2);
+                int indV3 =-1;
+                for(int j=0; j<3; j++){
+                    if(faces[indFaceAdja].vertices[j] == indV1 || faces[indFaceAdja].vertices[j] == indV2){
+                        continue;
+                    }else{
+                        indV3 = j;
+                        break;
+                    }
+                }
+                if(indV3 == -1){
+                    std::cout << "insert infinite face fail" << std::endl;
+                }
+
+                if(previousWasCreated){
+                    --cicFace2;
+                    int idNewFace = cicFace0.idFace;
+                    faces[idCurrentFace].adjacentTrianglesId[0] = cicFace2.idFace;
+                    faces[idCurrentFace].adjacentTrianglesId[1] = idNewFace;
+                    --cicFace0;
+                    faces[idCurrentFace].adjacentTrianglesId[2] = cicFace0.idFace;
+                    faces[cicFace0.idFace].adjacentTrianglesId[0] = idCurrentFace;
+
+                    faces[idNewFace].vertices[0] = indV1;
+                    faces[idNewFace].vertices[1] = idNewVertice;
+                    faces[idNewFace].vertices[2] = indV2;
+
+                    faces[idNewFace].adjacentTrianglesId[0] = -1;
+                    faces[idNewFace].adjacentTrianglesId[1] = indFaceAdja;
+                    faces[idNewFace].adjacentTrianglesId[2] = -1; //fusioner avec ligne plus bas
+                    faces[idNewFace].isInfinite = true;
+
+
+                    faces[idCurrentFace].vertices[0] = idNewVertice;
+
+                    faces[idNewFace].adjacentTrianglesId[2] = idNewFace-1;//set vertice 2 adjacent sur face precedente.    //elle
+                    faces[idNewFace-1].adjacentTrianglesId[0] = idNewFace;//set vertice 0 face precedente sur nous.
+                    ++cicFace2;
+                }else {
+                    faces.push_back(Face(indV1,idNewVertice,indV2,-1,indFaceAdja,-1));
+                    int idNewFace = faces.size()-1;
+
+                    faces[indFaceAdja].adjacentTrianglesId[indV3] = idNewFace;  //modifie face adjacent du triangle contre le notre.
+
+                    faces[idCurrentFace].adjacentTrianglesId[0] = idNewFace+1;
+                    faces[idCurrentFace].adjacentTrianglesId[1] = idNewFace;
+
+                    faces[idCurrentFace].vertices[2] = idNewVertice;
+
+                    faces.push_back(Face(idNewVertice,0,indV2,cicFace2.idFace,idNewFace, idCurrentFace,false));
+                    faces[cicFace2.idFace].adjacentTrianglesId[2] = idNewFace+1;
+
+                    ++cicFace1;
+                    ++cicFace0;
+                    ++cicFace2;
+                }
+
+                previousWasCreated = true;
+                //saute l'arrete convexe contenant le point a add
+
+
+            }
+            ++cicFace1;
+            ++cicFace0;
+        }while(cicFace1.idFace != cicBegin.idFace);
+    }else{
+        int indA = faces[indFace].vertices[0];
+        int indB = faces[indFace].vertices[1];
+        int indC = faces[indFace].vertices[2];
+        int indP =  vertices.size() - 1;
+        int indTriangleDroite = faces.size();
+        int indTriangleGauche = faces.size() + 1;
+        int exIndAdjacentA = faces[indFace].adjacentTrianglesId[0];
+        int exIndAdjacentB = faces[indFace].adjacentTrianglesId[1];
+
+        faces[indFace].adjacentTrianglesId[0] = indTriangleDroite;
+        faces[indFace].adjacentTrianglesId[1] = indTriangleGauche;
+        faces[indFace].vertices[2] = indP;
+
+        faces.push_back(Face(indB,indC,indP));
+        faces[indTriangleDroite].adjacentTrianglesId[0] = indTriangleGauche;
+        faces[indTriangleDroite].adjacentTrianglesId[1] = indFace;
+        faces[indTriangleDroite].adjacentTrianglesId[2] = exIndAdjacentA;
+
+        faces.push_back(Face(indC,indA,indP));
+        faces[indTriangleGauche].adjacentTrianglesId[0] = indFace;
+        faces[indTriangleGauche].adjacentTrianglesId[1] = indTriangleDroite;
+        faces[indTriangleGauche].adjacentTrianglesId[2] = exIndAdjacentB;
+
+        for(int i =0; i<3; i++){
+            if(faces[indTriangleDroite].adjacentTrianglesId[2] != -1){
+                if(faces[faces[indTriangleDroite].adjacentTrianglesId[2]].adjacentTrianglesId[i] == indFace){
+                    faces[faces[indTriangleDroite].adjacentTrianglesId[2]].adjacentTrianglesId[i] = indTriangleDroite;
+                }
+            }
+
+            if(faces[indTriangleGauche].adjacentTrianglesId[2] != -1){
+                if(faces[faces[indTriangleGauche].adjacentTrianglesId[2]].adjacentTrianglesId[i] == indFace){
+                    faces[faces[indTriangleGauche].adjacentTrianglesId[2]].adjacentTrianglesId[i] = indTriangleGauche;
+                }
+            }
+        }
+    }
 
 }
 

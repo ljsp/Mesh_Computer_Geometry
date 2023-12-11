@@ -4,8 +4,7 @@
 
 #include "Include/Structures.h"
 
-Face::Face(int v0, int v1, int v2, int tri0, int tri1, int tri2)
-{
+Face::Face(int v0, int v1, int v2, int tri0, int tri1, int tri2, bool infinite) {
     vertices[0] = v0;
     vertices[1] = v1;
     vertices[2] = v2;
@@ -15,6 +14,7 @@ Face::Face(int v0, int v1, int v2, int tri0, int tri1, int tri2)
     adjacentTrianglesId[2] = tri2;
 
     normal = Point(0, 0, 0);
+    isInfinite = infinite;
 }
 
 Face::~Face() {
