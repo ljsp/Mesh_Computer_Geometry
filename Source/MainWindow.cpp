@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->object_list->addItem(QString("cube"));
     ui->object_list->addItem(QString("square"));
     ui->object_list->addItem(QString("sphere"));
+    ui->object_list->addItem(QString("alpes"));
     ui->object_list->connect(ui->object_list, SIGNAL(currentRowChanged(int)), this, SLOT(setCurrentMesh(int)));
 
     ui->color_radioButton->connect(ui->color_radioButton, SIGNAL(clicked()), this, SLOT(setDraw()));

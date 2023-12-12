@@ -15,6 +15,7 @@ public :
     void draw();
     void drawWireFrame();
     void addMesh(QString filename, bool isTriangulated);
+    void addPoints(QString filename);
     std::vector<Mesh> _meshes;
     Mesh _mesh;
 };

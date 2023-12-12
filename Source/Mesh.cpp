@@ -301,6 +301,37 @@ void Mesh::loadOFF(const char *filename, bool isTriangulated) {
     file.close();
 }
 
+void Mesh::loadPoints(const char *filename) {
+    vertices.clear(); faces.clear();
+
+    std::ifstream file;
+    file.open(filename);
+    if(!file.is_open()) {
+        std::cout << "Error opening file" << std::endl;
+        return;
+    }
+    int numVertices;
+    file >> numVertices;
+    for(int i = 0; i < numVertices; i++) {
+        double x, y, z;
+        file >> x >> y >> z;
+        vertices.emplace_back(Point(x / 100, y / 100, z / 100), -1);
+    }
+
+    for(int i = 0; i < numVertices - 1; i+=3) {
+        faces.emplace_back(i, i+1, i+2, -1, -1, -1);
+        std::pair<int,int> edge0 = edge(i, i+1);
+        std::pair<int,int> edge1 = edge(i+1, i+2);
+        std::pair<int,int> edge2 = edge(i, i+2);
+
+        insertMap(edge0, i/3, 2);
+        insertMap(edge1, i/3, 0);
+        insertMap(edge2, i/3, 1);
+    }
+
+    file.close();
+}
+
 void Mesh::insertMap(std::pair<int,int> edge, int faceId, int sommetId) {
     if(map.find(edge) == map.end()) {
         std::pair<int,int> val = std::make_pair(faceId,sommetId);
@@ -763,3 +794,55 @@ bool Mesh::estDansCercleCirconscrit(const Point& A, const Point& B, const Point&
 
     return determinant * (dA * dB * dC) < 0.0;
 }
+
+void Mesh::splitEdge(int face, int edge) {
+    int indA = faces[face].vertices[edge];
+    int indB = faces[face].vertices[(edge+1)%3];
+    Point p = (vertices[indA].point + vertices[indB].point) / 2;
+    splitTriangle(face, p);
+}
+
+void Mesh::contractEdge(int face, int edge) {
+    int indA = faces[face].vertices[edge];
+    int indB = faces[face].vertices[(edge+1)%3];
+    Point p = (vertices[indA].point + vertices[indB].point) / 2;
+    vertices[indA].point = p;
+    vertices[indB].point = p;
+}
+
+void Mesh::simplifyMesh(int nbFace) {
+    while(faces.size() > nbFace) {
+        int min = 1000000;
+        int indice = -1;
+        for(int i = 0; i < faces.size(); i++) {
+            if(faces.at(i).isVisible) {
+                int nbAdj = 0;
+                for(int j = 0; j < 3; j++) {
+                    if(faces.at(i).adjacentTrianglesId[j] != -1) {
+                        nbAdj++;
+                    }
+                }
+                if(nbAdj < min) {
+                    min = nbAdj;
+                    indice = i;
+                }
+            }
+        }
+        if(indice != -1) {
+            int edge = -1;
+            for(int i = 0; i < 3; i++) {
+                if(faces.at(indice).adjacentTrianglesId[i] != -1) {
+                    edge = i;
+                }
+            }
+            if(edge != -1) {
+                splitEdge(indice, edge);
+            }
+            else {
+                faces.at(indice).isVisible = false;
+            }
+        }
+    }
+}
+
+

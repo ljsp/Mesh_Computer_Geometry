@@ -31,6 +31,7 @@ public:
 
     void initializeIteratorsAndCirulators();
     void loadOFF(const char* filename, bool isTriangulated);
+    void loadPoints(const char* filename);
     void saveOFF(QString filename);
     void insertMap(std::pair<int,int> edge, int faceId, int sommetId);
     static std::pair<int,int> edge(int v1, int v2);
@@ -55,6 +56,9 @@ public:
     Point calculateCircumcenter(const Point& A, const Point& B, const Point& C);
     bool estDansCercleCirconscrit(const Point& A, const Point& B, const Point& C, const Point& point);
 
+    void simplifyMesh(int nbFace);
+    void splitEdge(int face, int edge);
+    void contractEdge(int face, int edge);
 
     struct Iterator_on_faces
     {

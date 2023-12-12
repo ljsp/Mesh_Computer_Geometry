@@ -28,6 +28,7 @@ void GLDisplayWidget::initializeGL()
     _geomWorld.addMesh("../Asset/cube_maillage_triangles.off", true);
     _geomWorld.addMesh("../Asset/square.off", true);
     _geomWorld.addMesh("../Asset/sphere.off", true);
+    _geomWorld.addPoints("../Asset/terrain_pointClouds/alpes_random_1.txt");
 
     _geomWorld._meshes.at(2).box2D();
 
@@ -35,16 +36,19 @@ void GLDisplayWidget::initializeGL()
     _geomWorld._meshes.at(1).initializeIteratorsAndCirulators();
     _geomWorld._meshes.at(2).initializeIteratorsAndCirulators();
     _geomWorld._meshes.at(3).initializeIteratorsAndCirulators();
+    _geomWorld._meshes.at(4).initializeIteratorsAndCirulators();
 
     _geomWorld._meshes.at(0).computeNormals();
     _geomWorld._meshes.at(1).computeNormals();
     _geomWorld._meshes.at(2).computeNormals();
     _geomWorld._meshes.at(3).computeNormals();
+    _geomWorld._meshes.at(4).computeNormals();
 
     _geomWorld._meshes.at(0).computeLaplacian();
     _geomWorld._meshes.at(1).computeLaplacian();
     //_geomWorld._meshes.at(2).computeLaplacian();
     _geomWorld._meshes.at(3).computeLaplacian();
+    //_geomWorld._meshes.at(4).computeLaplacian();
 }
 
 void GLDisplayWidget::paintGL(){

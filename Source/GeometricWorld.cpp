@@ -60,3 +60,9 @@ void GeometricWorld::addMesh(QString filename, bool isTriangulated) {
     mesh.loadOFF(filename.toStdString().c_str(), isTriangulated);
     _meshes.push_back(mesh);
 }
+
+void GeometricWorld::addPoints(QString filename) {
+    Mesh mesh;
+    mesh.loadPoints(filename.toStdString().c_str());
+    _meshes.push_back(mesh);
+}
