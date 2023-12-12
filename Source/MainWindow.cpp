@@ -14,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->object_list->addItem(QString("queen"));
     ui->object_list->addItem(QString("cube"));
     ui->object_list->addItem(QString("square"));
+    ui->object_list->addItem(QString("sphere"));
     ui->object_list->connect(ui->object_list, SIGNAL(currentRowChanged(int)), this, SLOT(setCurrentMesh(int)));
 
     ui->color_radioButton->connect(ui->color_radioButton, SIGNAL(clicked()), this, SLOT(setDraw()));
@@ -33,6 +34,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->splitButton->connect(ui->splitButton, SIGNAL(clicked()), this, SLOT(splitTriangle()));
     ui->flipEdge_Button->connect(ui->flipEdge_Button, SIGNAL(clicked()), this, SLOT(flipEdge()));
+
+    ui->delauney_Button->connect(ui->delauney_Button, SIGNAL(clicked()), this, SLOT(makeDelauney()));
 }
 
 MainWindow::~MainWindow()
@@ -117,9 +120,15 @@ void MainWindow::splitTriangle() {
     for (int i = 0; i < numberSplit; ++i) {
         double x = (double) rand() / RAND_MAX;
         double y = (double) rand() / RAND_MAX;
+        x *= 2;
+        y *= 2;
         int face = rand() % 2;
 
-        ui->widget->_geomWorld._meshes.at(ui->widget->currentMesh).splitTriangle(idFace,Point(x,y,0));
+        ui->widget->_geomWorld._meshes.at(ui->widget->currentMesh).splitTriangle(idFace,Point(2,0,0));
     }
+}
+
+void MainWindow::makeDelauney() {
+    ui->widget->_geomWorld._meshes.at(ui->widget->currentMesh).findNonDelaunayEdge();
 }
 

@@ -24,6 +24,27 @@ Mesh::Mesh() {
 Mesh::~Mesh() {
 }
 
+void Mesh::box2D(){
+    vertices.clear();
+    Vertex infinitePoint = Vertex(Point(0,0,-50),-1);
+    vertices.push_back(infinitePoint); //point infinie du 2D
+
+    vertices.push_back(Vertex(Point(0,0,0),0));
+    vertices.push_back(Vertex(Point(1,0,0),0));
+    vertices.push_back(Vertex(Point(1,1,0),0));
+    vertices.push_back(Vertex(Point(0,1,0),1));
+
+    faces.clear();
+    faces.push_back(Face(1,2,3,-1,1,-1));
+    faces.push_back(Face(1,3,4,-1,-1,0));
+
+    //infinite
+    faces.push_back(Face(1,0,2,3,0,5,false));
+    faces.push_back(Face(2,0,3,4,0,2,false));
+    faces.push_back(Face(3,0,4,5,1,3,false));
+    faces.push_back(Face(4,0,1,2,1,4,false));
+}
+
 void Mesh::drawTriangle(int i, double r, double g, double b) {
     glColor3d(r,g,b);
     glBegin(GL_TRIANGLES);
@@ -62,7 +83,9 @@ void Mesh::drawMesh(DrawMode drawMode) {
 void Mesh::drawMeshColor() {
     double r = 0.8; double g = 0.2; double b = 0.2;
     for(int i = 0; i < faces.size(); i++) {
-        drawTriangle(i, r, g, b);
+        if(faces.at(i).isVisible) {
+            drawTriangle(i, r, g, b);
+        }
     }
 }
 
@@ -116,68 +139,74 @@ void Mesh::drawMeshWireFrame() {
         glColor3d(faces.at(i).normal._x,
                   faces.at(i).normal._y,
                   faces.at(i).normal._z);
-        glBegin(GL_LINE_STRIP);
-        glPointDraw(vertices.at(faces[i].vertices[0]).point);
-        glPointDraw(vertices.at(faces[i].vertices[1]).point);
-        glEnd();
-        glBegin(GL_LINE_STRIP);
-        glPointDraw(vertices.at(faces[i].vertices[1]).point);
-        glPointDraw(vertices.at(faces[i].vertices[2]).point);
-        glEnd();
-        glBegin(GL_LINE_STRIP);
-        glPointDraw(vertices.at(faces[i].vertices[0]).point);
-        glPointDraw(vertices.at(faces[i].vertices[2]).point);
-        glEnd();
+        if(faces.at(i).isVisible) {
+            glBegin(GL_LINE_STRIP);
+            glPointDraw(vertices.at(faces[i].vertices[0]).point);
+            glPointDraw(vertices.at(faces[i].vertices[1]).point);
+            glEnd();
+            glBegin(GL_LINE_STRIP);
+            glPointDraw(vertices.at(faces[i].vertices[1]).point);
+            glPointDraw(vertices.at(faces[i].vertices[2]).point);
+            glEnd();
+            glBegin(GL_LINE_STRIP);
+            glPointDraw(vertices.at(faces[i].vertices[0]).point);
+            glPointDraw(vertices.at(faces[i].vertices[2]).point);
+            glEnd();
+        }
     }
 }
 
 void Mesh::drawMeshNormals() {
     for(int i = 0; i < faces.size(); i++) {
-        glColor3d(faces.at(i).normal._x,
-                  faces.at(i).normal._y,
-                  faces.at(i).normal._z);
-        glBegin(GL_TRIANGLES);
-        glPointDraw(vertices.at(faces[i].vertices[0]).point);
-        glPointDraw(vertices.at(faces[i].vertices[1]).point);
-        glPointDraw(vertices.at(faces[i].vertices[2]).point);
-        glEnd();
+        if(faces.at(i).isVisible) {
+            glColor3d(faces.at(i).normal._x,
+                      faces.at(i).normal._y,
+                      faces.at(i).normal._z);
+            glBegin(GL_TRIANGLES);
+            glPointDraw(vertices.at(faces[i].vertices[0]).point);
+            glPointDraw(vertices.at(faces[i].vertices[1]).point);
+            glPointDraw(vertices.at(faces[i].vertices[2]).point);
+            glEnd();
+        }
     }
 }
 
 void Mesh::drawMeshStitching() {
     for(int i = 0; i < faces.size(); i++) {
-        glColor3d(0.0,1.0,1.0);
+        if(faces.at(i).isVisible) {
+            glColor3d(0.0,1.0,1.0);
 
-        Point faceBarycenter = (vertices.at(faces[i].vertices[0]).point +
-                                vertices.at(faces[i].vertices[1]).point +
-                                vertices.at(faces[i].vertices[2]).point) / 3;
+            Point faceBarycenter = (vertices.at(faces[i].vertices[0]).point +
+                                    vertices.at(faces[i].vertices[1]).point +
+                                    vertices.at(faces[i].vertices[2]).point) / 3;
 
-        Point firstNeighborBarycenter  = (vertices.at(faces.at(faces.at(i).adjacentTrianglesId[0]).vertices[0]).point +
-                                          vertices.at(faces.at(faces.at(i).adjacentTrianglesId[0]).vertices[1]).point +
-                                          vertices.at(faces.at(faces.at(i).adjacentTrianglesId[0]).vertices[2]).point) / 3;
+            Point firstNeighborBarycenter  = (vertices.at(faces.at(faces.at(i).adjacentTrianglesId[0]).vertices[0]).point +
+                                              vertices.at(faces.at(faces.at(i).adjacentTrianglesId[0]).vertices[1]).point +
+                                              vertices.at(faces.at(faces.at(i).adjacentTrianglesId[0]).vertices[2]).point) / 3;
 
-        Point secondNeighborBarycenter = (vertices.at(faces.at(faces.at(i).adjacentTrianglesId[1]).vertices[0]).point +
-                                          vertices.at(faces.at(faces.at(i).adjacentTrianglesId[1]).vertices[1]).point +
-                                          vertices.at(faces.at(faces.at(i).adjacentTrianglesId[1]).vertices[2]).point) / 3;
+            Point secondNeighborBarycenter = (vertices.at(faces.at(faces.at(i).adjacentTrianglesId[1]).vertices[0]).point +
+                                              vertices.at(faces.at(faces.at(i).adjacentTrianglesId[1]).vertices[1]).point +
+                                              vertices.at(faces.at(faces.at(i).adjacentTrianglesId[1]).vertices[2]).point) / 3;
 
-        Point thirdNeighborBarycenter  = (vertices.at(faces.at(faces.at(i).adjacentTrianglesId[2]).vertices[0]).point +
-                                          vertices.at(faces.at(faces.at(i).adjacentTrianglesId[2]).vertices[1]).point +
-                                          vertices.at(faces.at(faces.at(i).adjacentTrianglesId[2]).vertices[2]).point) / 3;
+            Point thirdNeighborBarycenter  = (vertices.at(faces.at(faces.at(i).adjacentTrianglesId[2]).vertices[0]).point +
+                                              vertices.at(faces.at(faces.at(i).adjacentTrianglesId[2]).vertices[1]).point +
+                                              vertices.at(faces.at(faces.at(i).adjacentTrianglesId[2]).vertices[2]).point) / 3;
 
-        glBegin(GL_LINE_STRIP);
-        glPointDraw(faceBarycenter);
-        glPointDraw(firstNeighborBarycenter);
-        glEnd();
+            glBegin(GL_LINE_STRIP);
+            glPointDraw(faceBarycenter);
+            glPointDraw(firstNeighborBarycenter);
+            glEnd();
 
-        glBegin(GL_LINE_STRIP);
-        glPointDraw(faceBarycenter);
-        glPointDraw(secondNeighborBarycenter);
-        glEnd();
+            glBegin(GL_LINE_STRIP);
+            glPointDraw(faceBarycenter);
+            glPointDraw(secondNeighborBarycenter);
+            glEnd();
 
-        glBegin(GL_LINE_STRIP);
-        glPointDraw(faceBarycenter);
-        glPointDraw(thirdNeighborBarycenter);
-        glEnd();
+            glBegin(GL_LINE_STRIP);
+            glPointDraw(faceBarycenter);
+            glPointDraw(thirdNeighborBarycenter);
+            glEnd();
+        }
     }
 }
 
@@ -185,52 +214,44 @@ void Mesh::drawInfPoint() {
     Point infPoint(0,0,-10);
     glColor3d(0.0,1.0,0.0);
     for (int i = 0; i < faces.size(); i++) {
-        glBegin(GL_LINE_STRIP);
-        if(faces.at(i).adjacentTrianglesId[0] == -1) {
-            glPointDraw(vertices.at(faces.at(i).vertices[0]).point);
-            glPointDraw(vertices.at(faces.at(i).vertices[1]).point);
-            glPointDraw(infPoint);
+        if(!faces.at(i).isVisible) {
+            glBegin(GL_LINE_STRIP);
+            glPointDraw(vertices.at(faces[i].vertices[0]).point);
+            glPointDraw(vertices.at(faces[i].vertices[1]).point);
+            glEnd();
+            glBegin(GL_LINE_STRIP);
+            glPointDraw(vertices.at(faces[i].vertices[1]).point);
+            glPointDraw(vertices.at(faces[i].vertices[2]).point);
+            glEnd();
+            glBegin(GL_LINE_STRIP);
+            glPointDraw(vertices.at(faces[i].vertices[0]).point);
+            glPointDraw(vertices.at(faces[i].vertices[2]).point);
+            glEnd();
         }
-        if(faces.at(i).adjacentTrianglesId[1] == -1) {
-            glPointDraw(vertices.at(faces.at(i).vertices[1]).point);
-            glPointDraw(vertices.at(faces.at(i).vertices[2]).point);
-            glPointDraw(infPoint);
-        }
-        if(faces.at(i).adjacentTrianglesId[2] == -1) {
-            glPointDraw(vertices.at(faces.at(i).vertices[0]).point);
-            glPointDraw(vertices.at(faces.at(i).vertices[2]).point);
-            glPointDraw(infPoint);
-        }
-        glEnd();
     }
-}
-
-std::array<float, 3> HSV(float val){
-    float X = (1 - std::abs(fmod( val / 60, 2) - 1));
-
-    if(val < 60) return {0, X,1};
-    if(val < 120) return {0, 1,X};
-    if(val < 180) return {X, 1,0};
-    if(val < 240) return {1, X,0};
-    if(val < 300) return {1, 0,X};
-    if(val < 360) return {X, 0,1};
-
-    float V =  1 - 1 / ( 1 + val / 10);
-    return {V, V, V};
 }
 
 void Mesh::drawMeshLaplacian() {
     for (int i = 0; i < faces.size(); ++i) {
-        glBegin(GL_TRIANGLES);
-        for(int j = 0; j < 3; j++){
-            int id = faces[i].vertices[j];
-            double val = Math::Norm(vertices[id].laplacian);
-            std::array<float, 3> rgb = HSV(val);
-            glColor3f(rgb[0], rgb[1], rgb[2]);
-            glPointDraw(vertices[id].point);
+        if(faces.at(i).isVisible) {
+            glBegin(GL_TRIANGLES);
+            for(int j = 0; j < 3; j++){
+                int id = faces[i].vertices[j];
+                double val = Math::Norm(vertices[id].laplacian);
+                std::array<float, 3> rgb = HSV(val);
+                glColor3f(rgb[0], rgb[1], rgb[2]);
+                glPointDraw(vertices[id].point);
+            }
+            glEnd();
         }
-        glEnd();
     }
+}
+
+void Mesh::initializeIteratorsAndCirulators() {
+    itf = faces_begin();
+    itv = vertices_begin();
+    cf = incident_faces(*itv);
+    cv = incident_vertices(*itv);
 }
 
 void Mesh::loadOFF(const char *filename, bool isTriangulated) {
@@ -280,13 +301,6 @@ void Mesh::loadOFF(const char *filename, bool isTriangulated) {
     file.close();
 }
 
-void Mesh::initializeIteratorsAndCirulators() {
-    itf = faces_begin();
-    itv = vertices_begin();
-    cf = incident_faces(*itv);
-    cv = incident_vertices(*itv);
-}
-
 void Mesh::insertMap(std::pair<int,int> edge, int faceId, int sommetId) {
     if(map.find(edge) == map.end()) {
         std::pair<int,int> val = std::make_pair(faceId,sommetId);
@@ -322,15 +336,16 @@ void Mesh::saveOFF(QString filename) {
     file.close();
 }
 
-double cotan(const Point& a, const Point& b) {
-    return Math::Dot(a,b) / Math::Norm(Math::Cross(a,b));
-}
-
-double triangleArea(const Point& p1, const Point& p2, const Point& p3) {
-    Point vec1 = p2 - p1;
-    Point vec2 = p3 - p1;
-    Point cross = Math::Cross(vec1, vec2);
-    return Math::Norm(cross);
+void Mesh::computeNormals() {
+    for(int i = 0; i < faces.size(); i++) {
+        Point a = vertices.at(faces.at(i).vertices[0]).point;
+        Point b = vertices.at(faces.at(i).vertices[1]).point;
+        Point c = vertices.at(faces.at(i).vertices[2]).point;
+        Point normal = Math::Cross(b-a, c-a);
+        normal = Math::Normalize(normal);
+        faces.at(i).normal = normal;
+        //printf("Face %d : %f %f %f\n", i, normal._x, normal._y, normal._z);
+    }
 }
 
 double Mesh::calculateAreaFacei(Vertex v){
@@ -343,6 +358,7 @@ double Mesh::calculateAreaFacei(Vertex v){
         Point p2 = vertices[f.vertices[1]].point;
         Point p3 = vertices[f.vertices[2]].point;
         area += triangleArea(p1, p2, p3);
+        ++cf;
     } while(cf.indice() != cfbegin.indice());
     return area / 3.0;
 }
@@ -407,31 +423,9 @@ void Mesh::computeLaplacian() {
     }
 }
 
-double Mesh::orientationTest(Point a, Point b, Point c) {
-    return a._x*(b._y - c._y) + b._x*(c._y - a._y) + c._x*(a._y - c._y);
-}
-
-int Orientation(Point a, Point b, Point c){
-
-    double dx1 = b._x - a._x;
-    double dy1 = b._y - a._y;
-    double dx2 = c._x - a._x;
-    double dy2 = c._y - a._y;
-
-    double crossProduct = (dx1 * dy2) - (dx2 * dy1);
-
-    if (crossProduct > 0) {
-        return 1.0; // Counter-clockwise
-    } else if (crossProduct < 0) {
-        return -1.0; // Clockwise
-    } else {
-        return 0.0; // Aligned
-    }
-}
-
 int Mesh::foundFace(int a, int b) {
     for (int i = 0; i < faces.size(); i++) {
-        if(faces[i].isInfinite){
+        if(faces[i].isVisible){
             int vertices[3] = {faces[i].vertices[0], faces[i].vertices[1], faces[i].vertices[2]};
             // Vérifiez si les sommets a et b appartiennent à ce triangle
             if ((a == vertices[0] || a == vertices[1] || a == vertices[2]) &&
@@ -443,8 +437,21 @@ int Mesh::foundFace(int a, int b) {
     return -1; // Aucune face trouvée
 }
 
+
+int Mesh::positionGlobalInVertices(Vertex & v){
+    int index = -1;
+    for(int i = 0; i<vertices.size();i++){
+        if(vertices[i].point == v.point){
+            index = i;
+            break;
+        }
+    }
+    return index;
+}
+
 void Mesh::flipEdge(int a, int b) {
-    int AoppB, BoppA = -1;
+    int AoppB = -1;
+    int BoppA = -1;
     for(int i = 0; i< 3; i++){
         if(faces[a].adjacentTrianglesId[i] == b){
             AoppB = i;
@@ -498,78 +505,9 @@ void Mesh::flipEdge(int a, int b) {
 
 }
 
-void Mesh::findCommonEdge(int face0, int face1, int &sharedPoint1, int &sharedPoint2, int &uniquePointF0, int &uniquePointF1) {
-    Face f0 = faces.at(face0);
-    Face f1 = faces.at(face1);
-
-    sharedPoint1 = -1; sharedPoint2 = -1; uniquePointF0 = -1; uniquePointF1 = -1;
-
-    for (int v0 : f0.vertices) {
-        bool foundInF1 = false;
-        for (int v1 : f1.vertices) {
-            if (v0 == v1) {
-                if (sharedPoint1 == -1) {
-                    sharedPoint1 = v0;
-                } else {
-                    sharedPoint2 = v0;
-                }
-                foundInF1 = true;
-                break;
-            }
-        }
-        if (!foundInF1) {
-            uniquePointF0 = v0;
-        }
-    }
-
-    for (int v1 : f1.vertices) {
-        if (v1 != sharedPoint1 && v1 != sharedPoint2) {
-            uniquePointF1 = v1;
-            break;
-        }
-    }
-}
-
-bool Mesh::inTriangle(int triId, Point p) {
-
-    Point ab = vertices.at(faces.at(triId).vertices[1]).point - vertices.at(faces.at(triId).vertices[0]).point;
-    Point bc = vertices.at(faces.at(triId).vertices[2]).point - vertices.at(faces.at(triId).vertices[1]).point;
-    Point ca = vertices.at(faces.at(triId).vertices[0]).point - vertices.at(faces.at(triId).vertices[2]).point;
-
-    Point ap = p - vertices.at(faces.at(triId).vertices[0]).point;
-    Point bp = p - vertices.at(faces.at(triId).vertices[1]).point;
-    Point cp = p - vertices.at(faces.at(triId).vertices[2]).point;
-
-    double dotABAP = Math::Dot(ab, ap);
-    double dotBCBP = Math::Dot(bc, bp);
-    double dotCACP = Math::Dot(ca, cp);
-
-    return (dotABAP >= 0 && dotBCBP >= 0 && dotCACP >=  0);
-}
-
-// Fonction pour vérifier la position d'un point par rapport à un triangle.
-int pointPosition(const Point& A, const Point& B, const Point& C, const Point& P) {
-    // Calculez l'orientation des trois côtés du triangle.
-    int orientABP = Orientation(A, B, P);
-    int orientBCP = Orientation(B, C, P);
-    int orientCAP = Orientation(C, A, P);
-
-    // Vérifiez si le point est situé à l'intérieur du triangle.
-    if (orientABP == orientBCP && orientBCP == orientCAP) {
-        if (orientABP == 0) {
-            return 0; // Le point est sur un bord du triangle.
-        } else {
-            return 1; // Le point est à l'intérieur du triangle.
-        }
-    }
-
-    return -1; // Le point est à l'extérieur du triangle.
-}
-
-
 int Mesh::indexFacePointInside(Point P){
     for (int i = 0; i < faces.size(); i++) {
-        if(faces[i].isInfinite){
+        if(faces[i].isVisible){
             const Point& A = vertices[faces[i].vertices[0]].point;
             const Point& B = vertices[faces[i].vertices[1]].point;
             const Point& C = vertices[faces[i].vertices[2]].point;
@@ -589,10 +527,15 @@ void Mesh::splitTriangle(int face, Point p) {
     int idNewVertice = vertices.size()-1;
     if(indFace == -1){
         std::cout << "insert infinite face point : " << p._x << "  " << p._y << std::endl;
-        Circulator_on_faces cicFace1 = incident_faces(vertices.at(0));
-        while(Orientation(vertices[faces[cicFace1.idFace].vertices[0]].point , p,  vertices[faces[cicFace1.idFace].vertices[2]].point) == 1){
-            ++cicFace1;         //ne pas commencer a circuler sur une arrete qui dois devenir un nouveau triangle
-        }                       //car celle d'avant peut aussi en etre une mais notre bool sera sur false;
+        Circulator_on_faces cicFace1 = incident_faces(vertices[0]);
+        Point a = vertices[faces[cicFace1.idFace].vertices[0]].point;
+        Point c = vertices[faces[cicFace1.idFace].vertices[2]].point;
+        while(Orientation(a,p, c) == 1) {
+            ++cicFace1;     //ne pas commencer a circuler sur une arrete qui dois devenir un nouveau triangle
+                            //car celle d'avant peut aussi en etre une mais notre bool sera sur false;
+            a = vertices[faces[cicFace1.idFace].vertices[0]].point;
+            c = vertices[faces[cicFace1.idFace].vertices[2]].point;
+        }
         Circulator_on_faces cicFace2 = cicFace1;
         Circulator_on_faces cicFace0 = cicFace1;
         --cicFace0;
@@ -637,7 +580,7 @@ void Mesh::splitTriangle(int face, Point p) {
                     faces[idNewFace].adjacentTrianglesId[0] = -1;
                     faces[idNewFace].adjacentTrianglesId[1] = indFaceAdja;
                     faces[idNewFace].adjacentTrianglesId[2] = -1; //fusioner avec ligne plus bas
-                    faces[idNewFace].isInfinite = true;
+                    faces[idNewFace].isVisible = true;
 
 
                     faces[idCurrentFace].vertices[0] = idNewVertice;
@@ -713,14 +656,110 @@ void Mesh::splitTriangle(int face, Point p) {
 
 }
 
-void Mesh::computeNormals() {
-    for(int i = 0; i < faces.size(); i++) {
-        Point a = vertices.at(faces.at(i).vertices[0]).point;
-        Point b = vertices.at(faces.at(i).vertices[1]).point;
-        Point c = vertices.at(faces.at(i).vertices[2]).point;
-        Point normal = Math::Cross(b-a, c-a);
-        normal = Math::Normalize(normal);
-        faces.at(i).normal = normal;
-        //printf("Face %d : %f %f %f\n", i, normal._x, normal._y, normal._z);
+int Mesh::whichIndex(int indiceFaceCurrent,int indiceVertexArround ){
+    int index = -1;
+    for(int i = 0; i<3;i++){
+        if(faces[indiceFaceCurrent].vertices[i] == indiceVertexArround){
+            index = i;
+            break;
+        }
     }
+    return index;
+}
+
+void Mesh::findNonDelaunayEdge() {
+    for (int i = 1; i < vertices.size(); ++i) {
+
+        Vertex vi = vertices.at(i);
+        Circulator_on_vertices cv = incident_vertices(vi);
+        Circulator_on_vertices cvBegin = cv;
+
+        do {
+            int indiceLocalI = whichIndex(cv.idFace, i);
+            int j = faces[cv.idFace].vertices[(indiceLocalI + 1) %3];
+            if (j != -1) {
+                if (!isEdgeDelaunay(i, j)) {
+                    std::cout << "Edge (" << i << ", " << j << ") is non-Delaunay." << std::endl;
+                    flipEdge(i,j);
+                }
+            }
+            cv++;
+        } while (cv.indice() != cvBegin.indice() && cv.isValid);
+    }
+}
+
+bool Mesh::isEdgeDelaunay(int vertexA, int vertexB) {
+    // Trouver les faces partageant les sommets A et B
+    std::vector<int> facesSharingVertexA;
+    std::vector<int> facesSharingVertexB;
+
+    for (int i = 0; i < faces.size(); ++i) {
+        if (faces[i].containsVertex(vertexA)) {
+            facesSharingVertexA.push_back(i);
+        }
+        if (faces[i].containsVertex(vertexB)) {
+            facesSharingVertexB.push_back(i);
+        }
+    }
+
+    // Trouver les faces communes
+    std::vector<int> commonFaces;
+    for (int i : facesSharingVertexA) {
+        for (int j : facesSharingVertexB) {
+            if (i == j) {
+                commonFaces.push_back(i);
+            }
+        }
+    }
+
+    // Vérifier la condition de Delaunay pour les faces communes
+    for (int faceIndex : commonFaces) {
+        int thirdVertex = faces[faceIndex].getThirdVertex(vertexA, vertexB);
+        if (!isDelaunayConditionSatisfied(vertexA, vertexB, thirdVertex, faceIndex)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool Mesh::isDelaunayConditionSatisfied(int vertexA, int vertexB, int vertexC, int faceIndex) {
+    const Point& A = vertices[vertexA].point;
+    const Point& B = vertices[vertexB].point;
+    const Point& C = vertices[vertexC].point;
+
+    Point circumcenter = calculateCircumcenter(A, B, C);
+
+    if (estDansCercleCirconscrit(A, B, C, circumcenter)) {
+        return false;
+    }
+
+    return true;
+}
+
+Point Mesh::calculateCircumcenter(const Point& A, const Point& B, const Point& C) {
+    // Calculer le milieu des côtés du triangle
+    Point midAB((A._x + B._x) / 2.0, (A._y + B._y) / 2.0, (A._z + B._z) / 2.0);
+    Point midBC((B._x + C._x) / 2.0, (B._y + C._y) / 2.0, (B._z + C._z) / 2.0);
+
+    // Calculer les pentes perpendiculaires
+    double slopeAB = -1.0 / ((B._y - A._y) / (B._x - A._x));
+    double slopeBC = -1.0 / ((C._y - B._y) / (C._x - B._x));
+
+    // Calculer les coordonnées du circumcenter
+    double circumcenterX = (slopeAB * midAB._x - slopeBC * midBC._x + midBC._y - midAB._y) / (slopeAB - slopeBC);
+    double circumcenterY = slopeAB * (circumcenterX - midAB._x) + midAB._y;
+
+    return Point(circumcenterX, circumcenterY, 0.0);
+}
+
+bool Mesh::estDansCercleCirconscrit(const Point& A, const Point& B, const Point& C, const Point& point) {
+    // Vérifier si le point est à l'intérieur du cercle circonscrit
+    double dA = (A._x - point._x) * (A._x - point._x) + (A._y - point._y) * (A._y - point._y);
+    double dB = (B._x - point._x) * (B._x - point._x) + (B._y - point._y) * (B._y - point._y);
+    double dC = (C._x - point._x) * (C._x - point._x) + (C._y - point._y) * (C._y - point._y);
+
+    double determinant = A._x * (B._y - C._y) - B._x * (A._y - C._y) + C._x * (A._y - B._y);
+
+    return determinant * (dA * dB * dC) < 0.0;
 }

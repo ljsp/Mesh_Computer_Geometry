@@ -29,6 +29,7 @@ public slots:
     void setCurrentMesh(int index);
     void flipEdge();
     void splitTriangle();
+    void makeDelauney();
 
 private:
     Ui::MainWindow *ui;

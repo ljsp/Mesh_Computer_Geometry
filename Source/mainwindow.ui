@@ -400,6 +400,19 @@
             </property>
            </widget>
           </widget>
+          <widget class="QPushButton" name="delauney_Button">
+           <property name="geometry">
+            <rect>
+             <x>90</x>
+             <y>540</y>
+             <width>89</width>
+             <height>25</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Delauney</string>
+           </property>
+          </widget>
          </widget>
         </widget>
        </item>
