@@ -55,9 +55,9 @@ void GeometricWorld::drawWireFrame() {
     glEnd();
 }
 
-void GeometricWorld::addMesh(QString filename, bool isTriangulated) {
+void GeometricWorld::addMesh(QString filename) {
     Mesh mesh;
-    mesh.loadOFF(filename.toStdString().c_str(), isTriangulated);
+    mesh.loadOFF(filename.toStdString().c_str());
     _meshes.push_back(mesh);
 }
 

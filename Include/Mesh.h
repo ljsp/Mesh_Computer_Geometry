@@ -30,7 +30,7 @@ public:
     void drawInfPoint();
 
     void initializeIteratorsAndCirulators();
-    void loadOFF(const char* filename, bool isTriangulated);
+    void loadOFF(const char* filename);
     void loadPoints(const char* filename);
     void saveOFF(QString filename);
     void insertMap(std::pair<int,int> edge, int faceId, int sommetId);
@@ -114,13 +114,19 @@ public:
 
         Circulator_on_faces() = default;
         explicit Circulator_on_faces(Mesh* m, Vertex &_v) : mesh(m), idFace(_v.triangleId){
-            Face &f = m->faces[idFace];
-            for(int i = 0; i < 3; i++)
-                if(mesh->vertices.at(f.vertices[i]).point == _v.point) idPivot = f.vertices[i];
+            idPivot = mesh->positionGlobalInVertices(_v);
+            if(idFace == -1) {
+                for (int i = 0; i < m->faces.size(); i++) {
+                    if (!m->faces[i].isVisible) {
+                        idFace = i;
+                        break;
+                    }
+                }
+            }
         }
 
         /*
-        Circulator_on_faces(Mesh* m, Vertex v) : mesh(m){
+        explicit Circulator_on_faces(Mesh* m, Vertex& v) : mesh(m){
             idPivot = mesh->positionGlobalInVertices(v);
             if(idPivot != 0){
                 idFace = mesh->vertices[idPivot].triangleId;
@@ -131,6 +137,7 @@ public:
                         break;
                     }
                 }
+                idFace = -1;
             }
         }*/
 
@@ -199,8 +206,6 @@ public:
         int indice(){ return idSuivant; }
 
         Vertex* operator->(){ return &mesh->vertices[idSuivant]; }
-
-        //unsigned int operator*(){ return mesh->sommets[idSuivant].getId(); }
 
         Circulator_on_vertices operator++(int) {
             Face f = mesh->faces[idFace];

@@ -24,10 +24,10 @@ void GLDisplayWidget::initializeGL()
     glEnable(GL_LIGHT0);
     glEnable(GL_COLOR_MATERIAL);
 
-    _geomWorld.addMesh("../Asset/queen.off", true);
-    _geomWorld.addMesh("../Asset/cube_maillage_triangles.off", true);
-    _geomWorld.addMesh("../Asset/square.off", true);
-    _geomWorld.addMesh("../Asset/sphere.off", true);
+    _geomWorld.addMesh("../Asset/queen.off");
+    _geomWorld.addMesh("../Asset/cube_maillage_triangles.off");
+    _geomWorld.addMesh("../Asset/square.off");
+    _geomWorld.addMesh("../Asset/sphere.off");
     _geomWorld.addPoints("../Asset/terrain_pointClouds/alpes_random_1.txt");
 
     _geomWorld._meshes.at(2).box2D();

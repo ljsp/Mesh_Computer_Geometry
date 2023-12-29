@@ -254,7 +254,7 @@ void Mesh::initializeIteratorsAndCirulators() {
     cv = incident_vertices(*itv);
 }
 
-void Mesh::loadOFF(const char *filename, bool isTriangulated) {
+void Mesh::loadOFF(const char *filename) {
     vertices.clear(); faces.clear();
 
     std::ifstream file;
@@ -279,13 +279,6 @@ void Mesh::loadOFF(const char *filename, bool isTriangulated) {
 
         for(int j = 0; j < nbVerticesInFace; j++) {
             file >> verticesInFace[j];
-        }
-
-        if(!isTriangulated) {
-            int trash;
-            for (int j = 0; j < 3; j++) {
-                file >> trash;
-            }
         }
 
         faces.emplace_back(verticesInFace[0], verticesInFace[1], verticesInFace[2], -1, -1, -1);
@@ -640,8 +633,6 @@ void Mesh::splitTriangle(int face, Point p) {
 
                 previousWasCreated = true;
                 //saute l'arrete convexe contenant le point a add
-
-
             }
             ++cicFace1;
             ++cicFace0;

@@ -55,7 +55,7 @@ void MainWindow::loadFile() {
                                                     "/home/lucas/Bureau/M2/GAM/Mesh_Computer_Geometry/Asset",
                                                     tr("OFF Files (*.off)"), 0,
                                                     QFileDialog::DontUseNativeDialog);
-    ui->widget->_geomWorld.addMesh(filename.toStdString().c_str(), false);
+    ui->widget->_geomWorld.addMesh(filename.toStdString().c_str());
     QString name = filename.split("/").last().remove(".off");
     ui->object_list->addItem(name);
     ui->widget->currentMesh = ui->object_list->count() + 1;
@@ -91,19 +91,23 @@ void MainWindow::setDrawModeCirculator() {
 }
 
 void MainWindow::drawIteratorCirculatorPrev() {
-    if(ui->widget->drawMode == DRAW_MESH_ITERATOR)
+    if(ui->widget->drawMode == DRAW_MESH_ITERATOR) {
         --ui->widget->_geomWorld._meshes.at(ui->widget->currentMesh).itf;
+    }
 
-    if(ui->widget->drawMode == DRAW_MESH_CIRCULATOR)
+    if(ui->widget->drawMode == DRAW_MESH_CIRCULATOR) {
         --ui->widget->_geomWorld._meshes.at(ui->widget->currentMesh).cf;
+    }
 }
 
 void MainWindow::drawIteratorCirculatorNext() {
-    if(ui->widget->drawMode == DRAW_MESH_ITERATOR)
+    if(ui->widget->drawMode == DRAW_MESH_ITERATOR) {
         ++ui->widget->_geomWorld._meshes.at(ui->widget->currentMesh).itf;
+    }
 
-    if(ui->widget->drawMode == DRAW_MESH_CIRCULATOR)
+    if(ui->widget->drawMode == DRAW_MESH_CIRCULATOR) {
         ++ui->widget->_geomWorld._meshes.at(ui->widget->currentMesh).cf;
+    }
 }
 
 void MainWindow::flipEdge() {
@@ -121,12 +125,17 @@ void MainWindow::splitTriangle() {
     for (int i = 0; i < numberSplit; ++i) {
         double x = (double) rand() / RAND_MAX;
         double y = (double) rand() / RAND_MAX;
-        x *= 2;
-        y *= 2;
-        int face = rand() % 2;
+        x *= 1.5;
+        y *= 1.5;
 
-        ui->widget->_geomWorld._meshes.at(ui->widget->currentMesh).splitTriangle(idFace,Point(2,0,0));
+        ui->widget->_geomWorld._meshes.at(ui->widget->currentMesh).splitTriangle(idFace,Point(x,y,0));
     }
+    /*
+    ui->widget->_geomWorld._meshes.at(ui->widget->currentMesh).splitTriangle(idFace,Point(0,2,0));
+    ui->widget->_geomWorld._meshes.at(ui->widget->currentMesh).splitTriangle(idFace,Point(2,1,0));
+    ui->widget->_geomWorld._meshes.at(ui->widget->currentMesh).splitTriangle(idFace,Point(2,0,0));
+    ui->widget->_geomWorld._meshes.at(ui->widget->currentMesh).splitTriangle(idFace,Point(2.1,3,0));
+    */
 }
 
 void MainWindow::makeDelauney() {
